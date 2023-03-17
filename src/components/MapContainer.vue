@@ -4,7 +4,7 @@
     :geojsonBaseLayer="geojsonBaseLayer"
     fluid
     class="pa-0"
-    style="height:85vh;width: 100%;"
+    style="height:90vh;width: 100%;"
   >
     <div :class="loaderClass"></div>
     <div id="popup"></div>

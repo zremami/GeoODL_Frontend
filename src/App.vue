@@ -59,11 +59,9 @@
         this.geojson = value;
       },
       precipitationFeatureCallback: function(value){
-        console.log('precipitationFeatureCallback', value)
         this.precipitationFeature = value;
       },
       odlFeatureCallback: function(value){
-        console.log('odlFeatureCallback', value)
         this.odlFeature = value;
       }
     }
