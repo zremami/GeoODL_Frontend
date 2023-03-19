@@ -1,5 +1,5 @@
 export default {
-    color: ['#e72ccc', '#666', '#5470c6', '#ccc', '#ddd', '#aaa', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'],
+    color: ['#666', '#e72ccc', '#5470c6', '#eee', '#f5f5f5', '#ccc', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'],
     title: {
         text: "" /*"Title"*/ ,
         left: "center",

@@ -1,6 +1,7 @@
 <template>
 
-  <v-card style="height:85vh;">
+  <v-card style="height:88vh;">
+    <!--
     <v-tabs
       v-model="tab"
       background-color="primary"
@@ -18,10 +19,11 @@
       <v-tab-item
         :key="items[0].tab"
       >
+      -->
         <v-card flat>
           <v-card-text>
             
-            <div class="figure">
+            <div class="figure" :style="`display:${odlFeature && odlFeature.result ? 'block' : 'none'}`">
               <e-chart
                 :option="odlOptions"
                 :init-options="initOptions"
@@ -31,22 +33,19 @@
             </div>
           </v-card-text>
 
-          <v-card-subtitle v-if="odlFeature && odlFeature.result">
-              {{ odlFeature.message.replace('{0}', odlFeature.localityName) }}
-
-              <!--
-              let badPoints = this.odlFeature.badPoints;
-              let goodPoints = this.odlFeature.goodPoints;
-              let localityCode = this.odlFeature.localityCode;
-              let localityName = this.odlFeature.localityName;
-              -->
-
+          <v-card-subtitle style="text-align: justify" v-if="odlFeature && odlFeature.message">
+              {{ odlFeature.message }}
+              <!--.replace('{0}', odlFeature.localityName).replace('{1}', odlFeature.badPoints).replace('{2}', odlFeature.goodPoints) -->
           </v-card-subtitle>
+          <v-card-title class="my-8 py-9 text-h2 my-auto justify-center" style="padding-top: 40vh !important;" v-else>
+              Do I have to be affraid of ODL?
+          </v-card-title>
         </v-card>
-        
+
+        <!--
       </v-tab-item>
 
-      <!--
+      
       <v-tab-item
         :key="items[1].tab"
       >
@@ -83,11 +82,9 @@
       
 
       </v-tab-item>
-    -->
-    </v-tabs-items>
+    
+    </v-tabs-items>-->
   </v-card>
-
- 
 
 </template>
 
@@ -271,7 +268,7 @@ export default {
         //precipitation.option.yAxis[0].name = 'Precipiation';
 
         let predictionKey = 'odl_prediction';
-        let predictionTitle = 'prediction odl';
+        let predictionTitle = 'predicted odl';
         let realKey = 'odl_real';
         let realTitle = 'real odl';
         let precipitationKey = 'precipitation';
@@ -392,11 +389,11 @@ export default {
           symbol: 'none'
         }
 
-        odl.option.legend.data.push(predictionTitle);
-        odl.option.series.push(newSerie1);
-
         odl.option.legend.data.push(realTitle);
         odl.option.series.push(newSerie2);
+
+        odl.option.legend.data.push(predictionTitle);
+        odl.option.series.push(newSerie1);
 
         odl.option.legend.data.push(precipitationTitle);
         odl.option.series.push(newSerie3);
