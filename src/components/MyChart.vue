@@ -1,6 +1,6 @@
 <template>
 
-  <v-card style="height:88vh;">
+  <v-card style="height:85vh;">
     <!--
     <v-tabs
       v-model="tab"
@@ -131,6 +131,10 @@ export default {
   props: {
     precipitationFeature: [],
     odlFeature: [],
+    dates: {
+      type: Array,
+      require: true,
+    },
   },
   data() {
     return {

@@ -4,9 +4,28 @@
     :geojsonBaseLayer="geojsonBaseLayer"
     fluid
     class="pa-0"
-    style="height:90vh;width: 100%;"
+    style="height:115vh;width: 100%;"
   >
-    <div :class="loaderClass"></div>
+    <v-dialog
+      v-model="loading"
+      hide-overlay
+      persistent
+      width="300"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          Please stand by
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <div id="popup"></div>
   </v-container>
 </template>
@@ -36,15 +55,20 @@
     components: {},
     props: {
       geojson: { type: Object, require: false},
-      baseLayerSelected: { type: Boolean, require: true, default: true}
+      baseLayerSelected: { type: Boolean, require: true, default: true},
+      dates: {
+        type: Array,
+        require: true,
+      },
     },
     data: () => ({
       vectorLayer: null,
       geojsonBaseLayer: DEU,
-      odl_7days_Url: 'http://127.0.0.1:5000/odls/{locality_code}/7-days',
+      localityCode: null,
+      odl_7days_Url: 'http://127.0.0.1:5000/odls/{locality_code}/7-days/{started}/{ended}',
       stationUrl: 'http://127.0.0.1:5000/stations',
-      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}',
-      loaderClass: null,
+      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}',
+      loading: false
     }),
     mounted() {
 
@@ -88,7 +112,14 @@
           this.updateSource(this.geojson, value)
         },
         deep: true
-      }
+      },
+      dates: {
+        handler: function () {
+          if(this.localityCode)
+            this.getOdlFeatures(this.localityCode);
+        },
+        deep: true
+      },
     },
     methods: {
       //basemap
@@ -163,13 +194,16 @@
               
               // Add popup
               let localityCode = feature.get('Locality_code');
-              var content = 
+              var content = localityCode ? 
                 '<ul class="popup-ul">' +
                   '<li><b>Locality_code:</b> ' + localityCode + '</li>' +
-                '</ul>';
+                '</ul>' : null;
 
-              popupContainer.innerHTML = content;
-              popupOverlay.setPosition(e.coordinate);
+              if(content)
+              {
+                popupContainer.innerHTML = content;
+                popupOverlay.setPosition(e.coordinate);
+              }
 
               return true;
             });
@@ -190,13 +224,14 @@
 
               //let local_authority = feature.get('local_authority');
 
-              let localityCode = feature.get('Locality_code');
+              self.localityCode = feature.get('Locality_code');
 
               //let features = self.geojson.features.filter((n) => {
                   //return n.properties.local_authority === local_authority;
               //});
 
-              self.getOdlFeatures(localityCode);
+              if(self.localityCode)
+                self.getOdlFeatures(self.localityCode);
               //self.getprecipitationFeatures(localityCode);
 
               //self.$emit('odlFeature', features);
@@ -223,10 +258,16 @@
 
         let result = null;
 
-        const regex = /{locality_code}/i;
-        let getFeatureUrl = this.odlUrl.replace(regex, locality_code);
+        const localityCodeRegex = /{locality_code}/i;
+        let getFeatureUrl = this.odlUrl.replace(localityCodeRegex, locality_code)
 
-        this.loaderClass = 'loader';
+        const startedRegex = /{started}/i;
+        getFeatureUrl = getFeatureUrl.replace(startedRegex, this.dates[0])
+
+        const endedRegex = /{ended}/i;
+        getFeatureUrl = getFeatureUrl.replace(endedRegex, this.dates[1])
+
+        this.loading = true;
         await fetch(getFeatureUrl)
           .then(response => response.json())
           .then(data => {
@@ -236,7 +277,7 @@
             this.$emit('odlFeature', result);
           } )
 
-        this.loaderClass = '';
+        this.loading = false;
 
         //this.$emit('wfsResponse', JSON.parse(this.jsondata));
         
@@ -251,7 +292,7 @@
         const regex = /{locality_code}/i;
         let getFeatureUrl = this.odl_7days_Url.replace(regex, locality_code);
 
-        this.loaderClass = 'loader';
+        this.loading = true;
         await fetch(getFeatureUrl)
           .then(response => response.json())
           .then(data => {
@@ -260,12 +301,11 @@
 
             this.$emit('precipitationFeature', result.features);
           } )
-
-        this.loaderClass = '';
+        this.loading = false;
 
       },
       getStations: async function(){
-        this.loaderClass = 'loader';
+        this.loading = true;
 
         let jsondata = null;
 
@@ -273,7 +313,7 @@
           .then(response => response.json())
           .then(data => { jsondata = JSON.stringify(data); } )
 
-        this.loaderClass = '';
+        this.loading = false;
 
         this.$emit('stationResponse', JSON.parse(jsondata));
       },
@@ -286,9 +326,7 @@
     border-radius: 5px;
     border: 1px solid grey;
     background-color: rgba(255, 255, 255, 0.9);
-    padding: 2px;
-    font-size: 12px;
-    width: 300px;
+    padding: 8px;
     list-style: none;
   }
 
