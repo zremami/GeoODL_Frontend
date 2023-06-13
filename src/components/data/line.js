@@ -1,12 +1,21 @@
 export default {
-    color: ['#666', '#e72ccc', '#5470c6', '#eee', '#f5f5f5', '#ccc', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc'],
+    color: [
+        '#e3b605' /*upper*/,
+        '#e3b605' /*lower*/,
+        /*'#f7e452' mean,*/
+        '#79ed81' /*min*/,
+        '#ed7979' /*max*/,
+        '#73c0de' /*precipitation*/,
+        '#b32291' /*prediction*/,
+        '#666' /*real*/ 
+    ],
     title: {
         text: "" /*"Title"*/ ,
         left: "center",
         top: "top",
         textStyle: {
             fontFamily: 'Inter, "Helvetica Neue", Arial, sans-serif',
-            fontSize: 14
+            fontSize: 18
         },
     },
     tooltip: {

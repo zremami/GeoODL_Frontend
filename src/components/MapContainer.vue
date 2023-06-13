@@ -4,7 +4,7 @@
     :geojsonBaseLayer="geojsonBaseLayer"
     fluid
     class="pa-0"
-    style="height:115vh;width: 100%;"
+    style="height:115vh;width: 100%;position: relative;"
   >
     <v-dialog
       v-model="loading"
@@ -27,6 +27,7 @@
       </v-card>
     </v-dialog>
     <div id="popup"></div>
+    <v-btn style="position: absolute;top:10px;right:10px;z-index: 1000" id="current-location-button">My Location {{ userLocation }}</v-btn>
   </v-container>
 </template>
 
@@ -39,15 +40,19 @@
   import VectorLayer from 'ol/layer/Vector'
   import VectorSource from 'ol/source/Vector'
   import GeoJSON from 'ol/format/GeoJSON'
+  import { fromLonLat } from 'ol/proj';
+  import Feature from 'ol/Feature';
+  import Point from 'ol/geom/Point';
   import 'ol/ol.css'
   
   // Default Data
   import DEU from '../assets/DEU.json'
 
   //Hovering
-  //import Fill from 'ol/style/Fill'
-  //import Stroke from 'ol/style/Stroke'
-  //import Style from 'ol/style/Style'
+  import Fill from 'ol/style/Fill'
+  import Stroke from 'ol/style/Stroke'
+  import Style from 'ol/style/Style'
+  //import Circle from 'ol/geom/Circle';
 
   export default {
     name: 'MapContainer',
@@ -60,6 +65,10 @@
         type: Array,
         require: true,
       },
+      effect: {
+        type: Number,
+        require: false,
+      },
     },
     data: () => ({
       vectorLayer: null,
@@ -67,13 +76,15 @@
       localityCode: null,
       odl_7days_Url: 'http://127.0.0.1:5000/odls/{locality_code}/7-days/{started}/{ended}',
       stationUrl: 'http://127.0.0.1:5000/stations',
-      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}',
-      loading: false
+      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}/{effect}',
+      loading: false,
+      userLocation: null,
     }),
     mounted() {
 
+      const vectorSource = new VectorSource()
       this.vectorLayer = new VectorLayer({
-        source: new VectorSource()
+        source: vectorSource
       });
 
       this.olMap = new Map({
@@ -90,6 +101,10 @@
           constrainResolution: true
         }),
       });
+
+      // Add the "current location" button event listener
+      const getCurrentLocationButton = document.getElementById('current-location-button');
+      getCurrentLocationButton.addEventListener('click', this.getCurrentLocation.bind(this, this.olMap, vectorSource));
 
       this.setFeatures();
 
@@ -114,6 +129,13 @@
         deep: true
       },
       dates: {
+        handler: function () {
+          if(this.localityCode)
+            this.getOdlFeatures(this.localityCode);
+        },
+        deep: true
+      },
+      effect: {
         handler: function () {
           if(this.localityCode)
             this.getOdlFeatures(this.localityCode);
@@ -193,11 +215,18 @@
 
               
               // Add popup
-              let localityCode = feature.get('Locality_code');
-              var content = localityCode ? 
+              //let localityCode = feature.get('Locality_code');
+              let localityName = feature.get('Locality_name');
+              //let geometry = feature.get('Geometry');
+              var content = localityName ? 
+              '<b>' + localityName + '</b>'
+              /*
                 '<ul class="popup-ul">' +
-                  '<li><b>Locality_code:</b> ' + localityCode + '</li>' +
-                '</ul>' : null;
+                  '<li><b>Name:</b> ' + localityName + '</li>' +
+                  '<li><b>Code:</b> ' + localityCode + '</li>' +
+                  '<li><b>Geometry:</b> [' + geometry + ']</li>' +
+                '</ul>'
+                */: null;
 
               if(content)
               {
@@ -252,6 +281,44 @@
       onlyUnique: function (value, index, self) {
         return self.indexOf(value) === index;
       },
+      getCurrentLocation: function (map, vectorSource) {
+        if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(position => {
+            const { longitude, latitude } = position.coords;
+
+            this.userLocation = [longitude, latitude]
+
+            //const features = vectorSource.getFeatures();
+
+            // Clear previous features
+            //vectorSource.clear();
+
+            let locationStyle = new Style({
+              fill: new Fill({ color: 'rgba(255, 0, 0, 1)' }),
+              stroke: new Stroke({ color: 'rgba(255, 255, 255, 1)', width: 2 }),
+            });
+
+            // Add a new feature representing the current location
+            const currentLocationFeature = new Feature({
+              geometry: new Point(fromLonLat(this.userLocation)),
+              labelPoint: new Point(this.userLocation),
+              style: locationStyle,
+              name: 'My Polygon',
+            });
+
+            //currentLocationFeature.setStyle(locationStyle);
+            vectorSource.addFeature(currentLocationFeature);
+
+            //console.log(features);
+
+            // Center the map on the current location
+            map.getView().setCenter(fromLonLat([longitude, latitude]));
+            map.getView().setZoom(12);
+          });
+        } else {
+          alert('Geolocation is not supported by your browser.');
+        }
+      },
 
       // get odl latest 7 days for selected locality_code
       getOdlFeatures: async function(locality_code){
@@ -261,11 +328,20 @@
         const localityCodeRegex = /{locality_code}/i;
         let getFeatureUrl = this.odlUrl.replace(localityCodeRegex, locality_code)
 
-        const startedRegex = /{started}/i;
-        getFeatureUrl = getFeatureUrl.replace(startedRegex, this.dates[0])
+        if(this.dates[0])
+        {
+          const startedRegex = /{started}/i;
+          getFeatureUrl = getFeatureUrl.replace(startedRegex, this.dates[0])
+        }
 
-        const endedRegex = /{ended}/i;
-        getFeatureUrl = getFeatureUrl.replace(endedRegex, this.dates[1])
+        if(this.dates[1])
+        {
+          const endedRegex = /{ended}/i;
+          getFeatureUrl = getFeatureUrl.replace(endedRegex, this.dates[1])
+        }
+
+        const effectRegex = /{effect}/i;
+        getFeatureUrl = getFeatureUrl.replace(effectRegex, this.effect)
 
         this.loading = true;
         await fetch(getFeatureUrl)

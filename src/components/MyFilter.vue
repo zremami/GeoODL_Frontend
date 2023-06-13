@@ -1,5 +1,126 @@
 <template>
 
+<v-expansion-panels>
+  <v-expansion-panel>
+      <v-expansion-panel-header v-slot="{ open }">
+        <v-row no-gutters align="center">
+          <v-col cols="4" class="d-flex justify-start">
+            Duration
+          </v-col>
+          <v-col
+            cols="8"
+            class="text--secondary"
+          >
+            <v-fade-transition leave-absolute>
+              <span v-if="open" key="0">When do you want to predicte? (The chart is showing 7 days)</span>
+              <v-row
+                v-else
+                no-gutters
+                key="1"
+              >
+                <v-col cols="12" class="d-flex justify-start">
+                  <v-text-field
+                    v-model="dateRangeText"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    label="Range date"
+                    hint="YYYY-MM-DD ISO format (8601)"
+                    class="ma-0 pb-0"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="0" class="d-flex justify-start">
+
+                  <!--
+                  End date: {{ datesFilter[1] || 'Not set' }}
+                  -->
+                </v-col>
+              </v-row>
+            </v-fade-transition>
+          </v-col>
+        </v-row>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-row
+          justify="space-around"
+          no-gutters
+        >
+          <v-col cols="12">
+            <v-date-picker
+              v-model="datesFilter"
+              range
+              full-width
+              show-current
+              show-week
+              landscape
+              :range-label="dateRangeText"
+              :min="minDate"
+              :max="maxDate"
+              :allowed-dates="(val) => allowedDates(val)"
+              @change="$emit('datesUpdated', datesFilter)"
+            ></v-date-picker>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <!--
+            <v-text-field
+              v-model="datesFilter[1]"
+              label="End date"
+              type="date"
+            ></v-text-field>
+            -->
+          </v-col>
+        </v-row>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
+
+    <v-expansion-panel>
+      <v-expansion-panel-header v-slot="{ open }">
+        <v-row no-gutters>
+          <v-col cols="4">
+            Precipitation Ratio
+          </v-col>
+          <v-col
+            cols="8"
+            class="text--secondary"
+          >
+            <v-fade-transition leave-absolute>
+              <span
+                v-if="open"
+                key="0"
+              >
+                Select effection
+              </span>
+              <span
+                v-else
+                key="1"
+              >
+                <strong>{{ effectFilter }}</strong>
+              </span>
+            </v-fade-transition>
+          </v-col>
+        </v-row>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content>
+        <v-row no-gutters>
+          <v-spacer></v-spacer>
+          <v-col cols="8">
+            <v-select
+              v-model="effectFilter"
+              :items="effects"
+              chips
+              flat
+              solo
+              hint="Enhance the impact of precipitation by incorporating a multiplication factor in the regression model."
+              @change="$emit('effectUpdated', effectFilter)"
+            ></v-select>
+          </v-col>
+        </v-row>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
+
+<!--
   <v-card flat style="height:30vh;width: 100%;">
 
     <v-card-text>
@@ -41,6 +162,7 @@
     </v-card-text>
 
   </v-card>
+  -->
 
 </template>
 
@@ -60,7 +182,11 @@ export default {
     },
   },
   data: () => ({
+    effectFilter: 1.0,
     datesFilter: [],
+    minDate: "2023-01-01",
+    maxDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+    effects: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
     }),
   computed: {
     dateRangeText () {
