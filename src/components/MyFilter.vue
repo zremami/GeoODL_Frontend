@@ -56,7 +56,7 @@
               :min="minDate"
               :max="maxDate"
               :allowed-dates="(val) => allowedDates(val)"
-              @change="$emit('datesUpdated', datesFilter)"
+              @change="$emit('datesUpdated', datesFilter.sort())"
             ></v-date-picker>
           </v-col>
 
@@ -78,10 +78,10 @@
       <v-expansion-panel-header v-slot="{ open }">
         <v-row no-gutters>
           <v-col cols="4">
-            Precipitation Ratio
+            Simulating Impact of Precipitation By Ratio
           </v-col>
           <v-col
-            cols="8"
+            cols="4"
             class="text--secondary"
           >
             <v-fade-transition leave-absolute>
@@ -89,13 +89,32 @@
                 v-if="open"
                 key="0"
               >
-                Select effection
+                Select Exact Time Effection
+              </span>
+              <span
+                v-else
+                key="0"
+              >
+                <strong>Actions at the Exact Time: {{ precipitationFilter }}</strong>
+              </span>
+            </v-fade-transition>
+          </v-col>
+          <v-col
+            cols="4"
+            class="text--secondary"
+          >
+            <v-fade-transition leave-absolute>
+              <span
+                v-if="open"
+                key="1"
+              >
+                Select 2 Hours Later Effection
               </span>
               <span
                 v-else
                 key="1"
               >
-                <strong>{{ effectFilter }}</strong>
+                <strong>Actions 2 Hours Later: {{ precipitation2Filter }}</strong>
               </span>
             </v-fade-transition>
           </v-col>
@@ -104,15 +123,26 @@
       <v-expansion-panel-content>
         <v-row no-gutters>
           <v-spacer></v-spacer>
-          <v-col cols="8">
+          <v-col cols="4">
             <v-select
-              v-model="effectFilter"
+              v-model="precipitationFilter"
               :items="effects"
               chips
               flat
               solo
               hint="Enhance the impact of precipitation by incorporating a multiplication factor in the regression model."
-              @change="$emit('effectUpdated', effectFilter)"
+              @change="$emit('effectUpdated', precipitationFilter)"
+            ></v-select>
+          </v-col>
+          <v-col cols="4">
+            <v-select
+              v-model="precipitation2Filter"
+              :items="effects"
+              chips
+              flat
+              solo
+              hint="Enhance the impact of precipitation by incorporating a multiplication factor in the regression model."
+              @change="$emit('effect2Updated', precipitation2Filter)"
             ></v-select>
           </v-col>
         </v-row>
@@ -182,11 +212,12 @@ export default {
     },
   },
   data: () => ({
-    effectFilter: 1.0,
+    precipitationFilter: 1.0,
+    precipitation2Filter: 1.0,
     datesFilter: [],
     minDate: "2023-01-01",
     maxDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-    effects: [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
+    effects: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0],
     }),
   computed: {
     dateRangeText () {

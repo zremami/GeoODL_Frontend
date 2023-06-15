@@ -16,6 +16,7 @@
               :geojson="geojson"
               :dates="dates"
               :effect="effect"
+              :effect2="effect2"
               @precipitationFeature="precipitationFeatureCallback"
               @odlFeature="odlFeatureCallback"
               @stationResponse="stationResponseMethod">
@@ -28,6 +29,7 @@
               :dates="dates"
               @datesUpdated="datesCallback"
               @effectUpdated="effectCallback"
+              @effect2Updated="effect2Callback"
               >
             </my-filter>
             <my-chart 
@@ -139,6 +141,7 @@ import MapContainer from './components/MapContainer'
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
       ],
       effect: 1.0,
+      effect2: 1.0,
     }),
     methods:
     {
@@ -156,6 +159,9 @@ import MapContainer from './components/MapContainer'
       },
       effectCallback: function(value){
         this.effect = value;
+      },
+      effect2Callback: function(value){
+        this.effect2 = value;
       }
     }
   }

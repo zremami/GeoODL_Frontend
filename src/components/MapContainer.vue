@@ -69,6 +69,10 @@
         type: Number,
         require: false,
       },
+      effect2: {
+        type: Number,
+        require: false,
+      },
     },
     data: () => ({
       vectorLayer: null,
@@ -76,7 +80,7 @@
       localityCode: null,
       odl_7days_Url: 'http://127.0.0.1:5000/odls/{locality_code}/7-days/{started}/{ended}',
       stationUrl: 'http://127.0.0.1:5000/stations',
-      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}/{effect}',
+      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}/{effect}/{effect2}',
       loading: false,
       userLocation: null,
     }),
@@ -136,6 +140,13 @@
         deep: true
       },
       effect: {
+        handler: function () {
+          if(this.localityCode)
+            this.getOdlFeatures(this.localityCode);
+        },
+        deep: true
+      },
+      effect2: {
         handler: function () {
           if(this.localityCode)
             this.getOdlFeatures(this.localityCode);
@@ -342,6 +353,9 @@
 
         const effectRegex = /{effect}/i;
         getFeatureUrl = getFeatureUrl.replace(effectRegex, this.effect)
+
+        const effect2Regex = /{effect2}/i;
+        getFeatureUrl = getFeatureUrl.replace(effect2Regex, this.effect2)
 
         this.loading = true;
         await fetch(getFeatureUrl)

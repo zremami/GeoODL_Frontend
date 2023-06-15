@@ -33,12 +33,18 @@
             </div>
           </v-card-text>
 
-          <v-card-subtitle style="text-align: justify" v-if="odlFeature && odlFeature.message">
+          <v-card-subtitle style="text-align: justify" v-if="odlFeature">
           <h2 class="my-2">Interpretation of the diagram</h2>
 
             <v-divider class="mb-2"></v-divider>
 
-            <span>This is a chart showing the real and predicted value of Ambient Gamma Dose Rates(AGDR) and Precipitation in 7 days from
+            <span>This is a chart showing the 
+              <b :style="`color:${odlOptions.color[6]}`" @mouseover="hoverLegend(realTitle)">{{ realTitle }}</b> and 
+              <b :style="`color:${odlOptions.color[5]}`" @mouseover="hoverLegend(predictionTitle)">{{ predictionTitle }}</b>
+               value of Ambient Gamma Dose Rates(AGDR) and 
+               Precipitation
+               <b :style="`color:${odlOptions.color[4]}`" @mouseover="hoverLegend(precipitationTitle)">{{ precipitationTitle }}</b>
+                in 7 days from
               <u>
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
@@ -46,8 +52,7 @@
                       class="d-inline-block"
                       v-bind="attrs"
                       v-on="on"
-                      @mouseover="hoverOver(Math.min(...odlFeature.result.map(e => e.end_measure)))"
-                      @mouseout="hoverOut"
+                      @mouseover="hoverOver([Math.min(...odlFeature.result.map(e => e.end_measure))])"
                     >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
                   </template>
                   <span>{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
@@ -61,8 +66,7 @@
                       class="d-inline-block"
                       v-bind="attrs"
                       v-on="on"
-                      @mouseover="hoverOver(Math.max(...odlFeature.result.map(e => e.end_measure)))"
-                      @mouseout="hoverOut"
+                      @mouseover="hoverOver([Math.max(...odlFeature.result.map(e => e.end_measure))])"
                     >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
                   </template>
                   <span>{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
@@ -72,7 +76,7 @@
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <strong
-                    class="d-inline-block"
+                    class="d-inline-block text-uppercase"
                     v-bind="attrs"
                     v-on="on"
                   >{{ odlFeature.localityName }}</strong>
@@ -82,47 +86,77 @@
               .
             </span>
 
-            To identify deviations from the normal range of AGDR (Ambient Gamma Dose Rate), a yellow boundary is displayed around the predicted value. This boundary serves as an indicator where the AGDR exceeds the expected value, suggesting a potential anomaly. Additionally, there are red and green lines representing the upper and lower limits of the AGDR range. These lines provide an approximate range for the natural ambient dose rate. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
+            To identify deviations from the normal range of AGDR (Ambient Gamma Dose Rate), a yellow boundary is displayed around the predicted value. This boundary serves as an indicator where the AGDR exceeds the expected value, suggesting a potential anomaly. Additionally, there are red and green lines representing the 
+            upper
+            <b :style="`color:${odlOptions.color[3]}`" @mouseover="hoverLegend(maxTitle)">{{ maxTitle }}</b>
+             and 
+            <b :style="`color:${odlOptions.color[2]}`" @mouseover="hoverLegend(minTitle)">{{ minTitle }}</b> 
+             limits of the AGDR range. These lines provide an approximate range for the natural ambient dose rate. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
 
-            Additionally, we can assess the model's performance by comparing the gradient of the predicted values with that of the actual values. For instance, at the given timestamps of
-            <span v-for="(goodPoint, index) in odlFeature.goodPoints" :key="goodPoint">
-              <span v-if="!index"></span>
-              <span v-else-if="index+1 != odlFeature.goodPoints.length">, </span>
-              <span v-else> and </span>
-              <u>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <strong
-                      class="d-inline-block"
-                      v-bind="attrs"
-                      v-on="on"
-                      @mouseover="hoverOver(goodPoint)"
-                      @mouseout="hoverOut"
-                    >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
-                  </template>
-                  <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
-                </v-tooltip>
-              </u>
+            Additionally, we can assess the model's performance by comparing the gradient of the predicted values with that of the actual values. For instance,
+            <span v-if="odlFeature.badPoints && odlFeature.badPoints.length">at the given timestamps of
+              <span v-for="(badPoint, index) in odlFeature.badPoints" :key="badPoint">
+                <span v-if="!index"></span>
+                <span v-else-if="index+1 != odlFeature.badPoints.length">, </span>
+                <span v-else> and </span>
+                  <u>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <strong
+                          class="d-inline-block"
+                          v-bind="attrs"
+                          v-on="on"
+                          @mouseover="hoverOver([badPoint])"
+                        >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                      </template>
+                      <span>{{ moment(badPoint * 1000).fromNow() }}</span>
+                    </v-tooltip>
+                  </u>
+              </span>
             </span>
-            , depicted by the red dotted lines, it is evident that while the predicted values are rising, the actual values are moving in the opposite direction. Conversely, when we observe the green dotted lines at 
-            <span v-for="(badPoint, index) in odlFeature.badPoints" :key="badPoint">
-              <span v-if="!index"></span>
-              <span v-else-if="index+1 != odlFeature.badPoints.length">, </span>
-              <span v-else> and </span>
-              <u>
+            <span v-if="odlFeature.goodPoints && odlFeature.goodPoints.length && odlFeature.badPoints && odlFeature.badPoints.length">, depicted by</span>
+            <span v-if="odlFeature.goodPoints && odlFeature.goodPoints.length">
+              the 
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <strong
+                    class="d-inline-block red--text"
+                    v-bind="attrs"
+                    v-on="on"
+                  >red dotted lines</strong>
+                </template>
+                <span>{{ odlFeature.badPoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+              </v-tooltip>
+                , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction. Conversely, when we observe the 
                 <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <strong
-                      class="d-inline-block"
-                      v-bind="attrs"
-                      v-on="on"
-                      @mouseover="hoverOver(badPoint)"
-                      @mouseout="hoverOut"
-                    >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
-                  </template>
-                  <span>{{ moment(badPoint * 1000).fromNow() }}</span>
-                </v-tooltip>
-              </u>
+                <template v-slot:activator="{ on, attrs }">
+                  <strong
+                    class="d-inline-block green--text"
+                    v-bind="attrs"
+                    v-on="on"
+                  >green dotted lines</strong>
+                </template>
+                <span>{{ odlFeature.goodPoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+              </v-tooltip>
+                 at 
+              <span v-for="(goodPoint, index) in odlFeature.goodPoints" :key="goodPoint">
+                <span v-if="!index"></span>
+                <span v-else-if="index+1 != odlFeature.goodPoints.length">, </span>
+                <span v-else> and </span>
+                <u>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <strong
+                        class="d-inline-block"
+                        v-bind="attrs"
+                        v-on="on"
+                        @mouseover="hoverOver([goodPoint])"
+                      >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                    </template>
+                    <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
+                  </v-tooltip>
+                </u>
+              </span>
             </span>
             , the model demonstrates good performance as the predicted and actual values exhibit a similar increasing pattern in their slopes.
             This observation is further supported by the presence of precipitation, indicated by the evidence of increased AGDR, thereby strengthening the hypothesis that the rise in AGDR is attributed to heightened precipitation.
@@ -131,7 +165,7 @@
             <v-row>
               <v-col cols="10" class="ma-auto">
                 Does the Ambient Gamma Dose Rate (AGDR) pose a significant risk in the vicinity of Germany?
-                <v-divide class="mb-5"></v-divide>
+                <v-divider class="mb-5"></v-divider>
                 <v-card-text>
                   <p>
                     The aim of this project is to develop a web-based Spatial Decision Support System (SDSS) that addresses a range of spatial problems by leveraging previous research and relevant aspects related to this study. The primary goal of the system is to provide decision-makers with a robust tool for solving spatial problems, with a specific focus on overcoming the challenges discussed in detail earlier. To evaluate the effectiveness and practicality of the proposed system, a comprehensive case study will be conducted in collaboration with Bundesamt für Strahlenschutz (BfS), a prominent organization in Germany.
@@ -277,6 +311,15 @@ export default {
       minRealValue: 0.05,
       moment,
       echartInstance: null,
+      // define legent titles
+      predictionTitle: 'Predicted AGDR',
+      realTitle: 'Real AGDR',
+      precipitationTitle: 'Precipitation',
+      //meanRealValueTitle: 'mean line',
+      stdUpperBoundTitle: 'Standard deviation upper',
+      stdLowerBoundTitle: 'Standard deviation lower',
+      maxTitle: 'High AGDR limit',
+      minTitle: 'Low AGDR limit',
     }
   },
   mounted() {
@@ -407,18 +450,10 @@ export default {
         //precipitation.option.yAxis[0].name = 'precipitation';
 
         let predictionKey = 'odl_prediction';
-        let predictionTitle = 'Predicted AGDR';
         let realKey = 'odl_real';
-        let realTitle = 'Real AGDR';
         let precipitationKey = 'precipitation';
-        let precipitationTitle = 'Precipitation';
-        //let meanRealValueTitle = 'mean line';
         //let stdUpperBoundKey = 'mae_upper_bound';
-        let stdUpperBoundTitle = 'Standard deviation upper';
         //let stdLowerBoundKey = 'mae_lower_bound';
-        let stdLowerBoundTitle = 'Standard deviation lower';
-        let maxTitle = 'High AGDR limit';
-        let minTitle = 'Low AGDR limit';
 
         odl.option.yAxis = [];
         odl.option.yAxis.push(
@@ -462,7 +497,7 @@ export default {
         });
 
         let realSerie = {
-          name: realTitle,
+          name: this.realTitle,
           type: 'line',
           yAxisIndex: 0,
           data: features.map(e => e[realKey]),
@@ -479,7 +514,7 @@ export default {
         }
 
         let predictionSerie = {
-          name: predictionTitle,
+          name: this.predictionTitle,
           type: 'line',
           yAxisIndex: 0,
           data: features.map(e => e[predictionKey]),
@@ -496,7 +531,7 @@ export default {
         }
 
         let precipitationSerie = {
-          name: precipitationTitle,
+          name: this.precipitationTitle,
           type: 'bar',
           yAxisIndex: 1,
           data: features.map(e => e[precipitationKey]),
@@ -514,7 +549,7 @@ export default {
         */
 
         let stdLowerBoundSerie = {
-          name: stdLowerBoundTitle,
+          name: this.stdLowerBoundTitle,
           type: 'line',
           data: features.map(() => (meanRealValue - stdRealValue).toPrecision(3) ),
           lineStyle: {
@@ -530,7 +565,7 @@ export default {
         }
 
         let stdUpperBoundSerie = {
-          name: stdUpperBoundTitle,
+          name: this.stdUpperBoundTitle,
           type: 'line',
           data: features.map(() => (meanRealValue + stdRealValue).toPrecision(3)),
           lineStyle: {
@@ -545,14 +580,14 @@ export default {
         }
 
         let maxSerie = {
-          name: maxTitle,
+          name: this.maxTitle,
           type: 'line',
           yAxisIndex: 0,
           data: features.map(() => this.maxRealValue),
           showSymbol: false,
         }
         let minSerie = {
-          name: minTitle,
+          name: this.minTitle,
           type: 'line',
           yAxisIndex: 0,
           data: features.map(() => this.minRealValue),
@@ -570,83 +605,15 @@ export default {
           realSerie
         ]
         odl.option.legend.data = [
-          realTitle, 
-          predictionTitle, 
-          precipitationTitle, 
-          stdLowerBoundTitle, 
-          stdUpperBoundTitle, 
-          //meanRealValueTitle, 
-          maxTitle, 
-          minTitle
+          this.realTitle, 
+          this.predictionTitle, 
+          this.precipitationTitle, 
+          this.stdLowerBoundTitle, 
+          this.stdUpperBoundTitle, 
+          //this.meanRealValueTitle, 
+          this.maxTitle, 
+          this.minTitle
         ]
-
-        /*
-        odl.option.legend.data.push(stdLowerBoundTitle);
-        odl.option.series.push(stdUpperBoundSerie);
-        
-        odl.option.legend.data.push(stdUpperBoundTitle);
-        odl.option.series.push(stdLowerBoundSerie);
-        
-        odl.option.legend.data.push(realTitle);
-        odl.option.series.push(realSerie);
-
-        odl.option.legend.data.push(predictionTitle);
-        odl.option.series.push(predictionSerie);
-
-        odl.option.legend.data.push(precipitationTitle);
-        odl.option.series.push(precipitationSerie);
-
-
-
-        odl.option.legend.data.push(meanRealValueTitle);
-        odl.option.series.push(meanRealValueSerie);
-
-        odl.option.legend.data.push(maxTitle);
-        odl.option.series.push(maxSerie);
-
-        odl.option.legend.data.push(minTitle);
-        odl.option.series.push(minSerie);
-        */
-
-        /*
-        odl.option.dataZoom = [
-          {
-            type: 'slider', // Set the type of dataZoom
-            start: 0,      // Set the initial start percentage
-            end: 100       // Set the initial end percentage
-          }
-        ];
-        *
-
-        odl.option.setOption(odl.option, true);
-
-
-        /*
-        odl.option.series.push(minSerie);
-        odl.option.series.push(maxSerie);
-        odl.option.series.push(meanRealValueSerie);
-        odl.option.series.push(stdLowerBoundSerie);
-        odl.option.series.push(stdUpperBoundSerie);
-        odl.option.series.push(precipitationSerie);
-        odl.option.series.push(predictionSerie);
-        odl.option.series.push(realSerie);
-
-        odl.option.legend.data.push(realTitle);
-        odl.option.legend.data.push(predictionTitle);
-        odl.option.legend.data.push(precipitationTitle);
-        odl.option.legend.data.push(stdUpperBoundTitle);
-        odl.option.legend.data.push(stdLowerBoundTitle);
-        odl.option.legend.data.push(meanRealValueTitle);
-        odl.option.legend.data.push(maxTitle);
-        odl.option.legend.data.push(minTitle);
-        */
-
-        //odl.option.legend.selected = {
-          //predictionTitle:true
-        //};
-
-        //precipitation.option.legend.data.push(precipitationKey);
-        //precipitation.option.series.push(precipitationSerie);
 
         // Create XAxis labels
         uniqueDates.forEach(timestamp => {
@@ -655,20 +622,7 @@ export default {
 
           var dateString = moment(date).format("y-MM-DD HH:mm:ss")
 
-          //let ye = new Intl.DateTimeFormat('en', { year: '2-digit' }).format(d);
-          //let mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
-          //let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
-          //let h = new Intl.DateTimeFormat('en', { hour: '2-digit' }).format(d);
-
-          //var xAxisTitle = `${da}${mo}${ye}`;
-          //var xAxisTitle = timestamp;
-
-          // Add labels of xAxis
           odl.option.xAxis[0].data.push(dateString);
-          //odl.option.xAxis[0].axisLabel.formatter = '\u00b5Sv/h';
-
-          //precipitation.option.xAxis[0].data.push(xAxisTitle);
-          //precipitation.option.xAxis[0].axisLabel.formatter = '\u00b5Sv/h';
         });
 
 
@@ -688,44 +642,45 @@ export default {
       const average = values.reduce((a,b) => a + b, 0) / values.length;
       return average;
     },
-    hoverOver:function (timestamp){
+    hoverOver:function (timestamps){
       // Access the chart instance and trigger the hover effect on the x-axis
-      //const chartContainer = this.$refs.odl;
-      //const chart2 = echarts.init(chartContainer);
-
       const chart = this.echartInstance;
 
       /* Get uniq dates */
       var uniqueDates = this.odlFeature.result.map(e => e.end_measure).filter(this.onlyUnique);
 
-      let indexOfTimestamp = uniqueDates.indexOf(timestamp)
+      /* Find index of hovering timestamps */
+      let indexOfTimestamps = uniqueDates
+        .map((ud, index) => timestamps.includes(ud) ? index : null)
+        .filter(elements => elements !== null)
 
-      //setInterval(() => { 
-       //indexOfTimestamp = (indexOfTimestamp + 1) % this.odlFeature.result.length 
-
-       // 显示 tooltip 
-       chart.dispatchAction({ 
-         type: 'showTip', 
-         seriesIndex: 0, 
-         dataIndex: indexOfTimestamp 
-       }) 
-     //}, 1000) 
-
-
-     /*
-      // Trigger the hover event on the x-axis
-      chart.dispatchAction({
-        type: 'downplay',
-        seriesIndex: [0, 1], // Series index to highlight (modify as needed)
-        dataIndex: 20, // Data index to highlight (modify as needed)
-        xAxisIndex: 0, // x-axis index to highlight
+      indexOfTimestamps.forEach(function(index) {
+        // 显示 tooltip 
+        chart.dispatchAction({ 
+          type: indexOfTimestamps.length > 1 ? 'showTip': 'showTip', 
+          seriesIndex: 0, 
+          dataIndex: index 
+        }) 
       })
-      */
     },
-    hoverOut:function (){
-      //this.$refs.odl.option.tooltip = {
-        //show: false
-      //};
+    hoverLegend:function (legendTitle){
+      // Access the chart instance and trigger the hover effect on the x-axis
+      const chart = this.echartInstance;
+
+      console.log(legendTitle)
+
+      // 显示 legend 
+      chart.dispatchAction({
+          type: 'legendUnSelect',
+          // legend name
+          name: legendTitle
+      })
+       // 显示 legend 
+       chart.dispatchAction({
+          type: 'legendSelect',
+          // legend name
+          name: legendTitle
+      })
     },
   }
 }
@@ -742,5 +697,18 @@ export default {
     display: block;
     width: 582px;
     height: 60vh;
+  }
+
+  .animated-span {
+    animation: fadeAnimation 0.5s;
+  }
+
+  @keyframes fadeAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 </style>
