@@ -4,7 +4,7 @@
     :geojsonBaseLayer="geojsonBaseLayer"
     fluid
     class="pa-0"
-    style="height:115vh;width: 100%;position: relative;"
+    style="height:90vh;width: 100%;position: relative;"
   >
     <v-dialog
       v-model="loading"

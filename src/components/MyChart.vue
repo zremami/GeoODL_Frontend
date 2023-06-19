@@ -85,19 +85,18 @@
               </v-tooltip>
               .
             </span>
-
             To identify deviations from the normal range of AGDR (Ambient Gamma Dose Rate), a yellow boundary is displayed around the predicted value. This boundary serves as an indicator where the AGDR exceeds the expected value, suggesting a potential anomaly. Additionally, there are red and green lines representing the 
             upper
             <b :style="`color:${odlOptions.color[3]}`" @mouseover="hoverLegend(maxTitle)">{{ maxTitle }}</b>
              and 
             <b :style="`color:${odlOptions.color[2]}`" @mouseover="hoverLegend(minTitle)">{{ minTitle }}</b> 
              limits of the AGDR range. These lines provide an approximate range for the natural ambient dose rate. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
-
-            Additionally, we can assess the model's performance by comparing the gradient of the predicted values with that of the actual values. For instance,
-            <span v-if="odlFeature.badPoints && odlFeature.badPoints.length">at the given timestamps of
-              <span v-for="(badPoint, index) in odlFeature.badPoints" :key="badPoint">
+             Furthermore, we can evaluate the hypothesis regarding the relationship between increased precipitation and AGDR by comparing the gradients of the predicted values with those of the actual values.
+             <span v-if="(odlFeature.falsePoints && odlFeature.falsePoints.length) || (odlFeature.truePoints && odlFeature.truePoints.length)"> For instance, </span>
+            <span v-if="odlFeature.falsePoints && odlFeature.falsePoints.length">at the given timestamps of
+              <span v-for="(badPoint, index) in odlFeature.falsePoints" :key="badPoint">
                 <span v-if="!index"></span>
-                <span v-else-if="index+1 != odlFeature.badPoints.length">, </span>
+                <span v-else-if="index+1 != odlFeature.falsePoints.length">, </span>
                 <span v-else> and </span>
                   <u>
                     <v-tooltip bottom>
@@ -114,8 +113,8 @@
                   </u>
               </span>
             </span>
-            <span v-if="odlFeature.goodPoints && odlFeature.goodPoints.length && odlFeature.badPoints && odlFeature.badPoints.length">, depicted by</span>
-            <span v-if="odlFeature.goodPoints && odlFeature.goodPoints.length">
+            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length && odlFeature.falsePoints && odlFeature.falsePoints.length">, depicted by</span>
+            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">
               the 
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -125,9 +124,9 @@
                     v-on="on"
                   >red dotted lines</strong>
                 </template>
-                <span>{{ odlFeature.badPoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                <span>{{ odlFeature.falsePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
               </v-tooltip>
-                , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction. Conversely, when we observe the 
+                , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction indicating there might be effect of other external elemt rather than precipitation. Conversely, when we observe the 
                 <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <strong
@@ -136,12 +135,12 @@
                     v-on="on"
                   >green dotted lines</strong>
                 </template>
-                <span>{{ odlFeature.goodPoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                <span>{{ odlFeature.truePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
               </v-tooltip>
                  at 
-              <span v-for="(goodPoint, index) in odlFeature.goodPoints" :key="goodPoint">
+              <span v-for="(goodPoint, index) in odlFeature.truePoints" :key="goodPoint">
                 <span v-if="!index"></span>
-                <span v-else-if="index+1 != odlFeature.goodPoints.length">, </span>
+                <span v-else-if="index+1 != odlFeature.truePoints.length">, </span>
                 <span v-else> and </span>
                 <u>
                   <v-tooltip bottom>
@@ -158,25 +157,26 @@
                 </u>
               </span>
             </span>
-            , the model demonstrates good performance as the predicted and actual values exhibit a similar increasing pattern in their slopes.
+            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">, as the predicted and actual values exhibit a similar increasing pattern in their slopes.</span>
             This observation is further supported by the presence of precipitation, indicated by the evidence of increased AGDR, thereby strengthening the hypothesis that the rise in AGDR is attributed to heightened precipitation.
           </v-card-subtitle>
           <v-card-title v-else>
             <v-row>
               <v-col cols="10" class="ma-auto">
-                Does the Ambient Gamma Dose Rate (AGDR) pose a significant risk in the vicinity of Germany?
+                Is the level of Ambient Gamma Dose Rate (AGDR) dangerously elevated in Germany?
                 <v-divider class="mb-5"></v-divider>
                 <v-card-text>
                   <p>
-                    The aim of this project is to develop a web-based Spatial Decision Support System (SDSS) that addresses a range of spatial problems by leveraging previous research and relevant aspects related to this study. The primary goal of the system is to provide decision-makers with a robust tool for solving spatial problems, with a specific focus on overcoming the challenges discussed in detail earlier. To evaluate the effectiveness and practicality of the proposed system, a comprehensive case study will be conducted in collaboration with Bundesamt für Strahlenschutz (BfS), a prominent organization in Germany.
+
+                    This project involves the development of a web-based spatial decision support system designed to assist doctors and policymakers in assessing the risk level of gamma ambient dose rate in Germany. The purpose of this application, developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," is to provide a comprehensive tool for analyzing and visualizing the gamma ambient dose rate data. The system is evaluated using this application, which has been specifically commissioned by BfS (Federal Office for Radiation Protection) 
                   </p><p>
-                    In recent years, there has been significant attention devoted to investigating the relationship between ambient gamma dose rate on the ground and precipitation, particularly within the context of BfS's research. As part of their extensive measurement activities, the BfS has diligently tracked environmental radioactivity levels throughout Germany, leading to the observation that the ambient gamma dose rate is correlated with precipitation levels.
+                    for this purpose. Its primary aim is to empower medical professionals and policymakers with valuable insights into the risk levels associated with gamma ambient dose rates across different regions in Germany.
                   </p><p>
-                    It is well-known that ionizing radiation, such as gamma radiation, can pose risks to human health and the environment, especially when the exposure levels are high. The BfS has reported that external factors such as rain can influence the intensity of the local dose rate. This phenomenon occasionally leads to a temporary doubling of the normal dose rate.
+                    It is worth noting that, according to a BfS report considering local conditions, the usual range for natural ambient radiation dose rate in Germany is between 0.05 and 0.18 μSv/h. Typically, external radiation exposure remains fairly constant; however, certain external factors, such as rain, can cause minor and temporary fluctuations in the local dose rate, resulting in slight increases or decreases.
                   </p><p>
-                    This information holds critical importance for public safety, as it enables individuals to comprehend the variations in radiation levels across different regions and under diverse weather conditions. Understanding these differences is crucial for ensuring appropriate measures are taken to protect public health.
+                    In order to determine if the elevated AGDR levels pose a danger, one solution is to demonstrate that the increase in AGDR is attributed to precipitation and falls within a safe range. To accomplish this, we utilize advanced data mining techniques and machine learning algorithms to establish a definitive relationship between AGDR and precipitation. The outcomes reveal encouraging correlations. This application leverages these data mining discoveries as a predictive and simulation model, presented through an interactive and user-friendly platform. This empowers doctors and policymakers to make well-informed decisions by analyzing these results.
                   </p><p>
-                    By developing a web-based SDSS that integrates and analyzes relevant data on ambient gamma dose rate and precipitation, this project aims to provide an effective solution to support decision-making processes, enhance public safety, and enable informed actions related to radiation protection.
+                    Upon selecting each station, target users will be presented with advanced data visualization featuring interpretations, as well as prediction and simulation tools. It should be noted that 
                   </p>
 
                   <v-carousel class="my-6">
@@ -197,6 +197,27 @@
               </v-col>
             </v-row>
           </v-card-title>
+
+          <v-card-actions>
+            <v-row
+              no-gutters
+              align="center"
+            >
+              <v-col cols="6" class="d-flex justify-start">
+                <v-switch
+                  v-model="negativePointActive"
+                  label="red"
+                  color="red"
+                  value="red"
+                  hide-details
+                  flat
+                  inset
+                >
+                </v-switch>
+              </v-col>
+
+            </v-row>
+          </v-card-actions>
         </v-card>
 
         <!--
@@ -418,12 +439,12 @@ export default {
 
       //console.log(features)
 
-      let badPoints = this.odlFeature.badPoints;
-      let goodPoints = this.odlFeature.goodPoints;
+      let falsePoints = this.odlFeature.falsePoints;
+      let truePoints = this.odlFeature.truePoints;
       //let localityCode = this.odlFeature.localityCode;
       let localityName = this.odlFeature.localityName;
-      let meanRealValue = this.odlFeature.meanRealValue;
-      let stdRealValue = this.odlFeature.stdRealValue;
+      let meanPredictValue = this.odlFeature.meanPredictValue;
+      let stdPredictValue = this.odlFeature.stdPredictValue;
       //let mape = this.odlFeature.mape;
 
       if(features && features.length)
@@ -434,11 +455,6 @@ export default {
         odl.option.xAxis.forEach(e => e.data = []);
         odl.option.series = [];
         odl.setOption(odlOptions, true);
-        //precipitation.option.legend.data = [];
-        //precipitation.option.xAxis.forEach(e => e.data = []);
-        //precipitation.option.series = [];
-        //precipitation.setOption(this.precipitationOptions, true);
-
 
         /* Get uniq dates */
         var uniqueDates = features.map(e => e.end_measure).filter(this.onlyUnique);
@@ -509,7 +525,7 @@ export default {
             symbol: ['none', 'none'],
             label: { show: false },
             lineStyle: { color: 'red'},
-            data: badPoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+            data: falsePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
           },
         }
 
@@ -526,7 +542,7 @@ export default {
             symbol: ['none', 'none'],
             label: { show: false },
             lineStyle: { color: 'green'},
-            data: goodPoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+            data: truePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
           },
         }
 
@@ -551,7 +567,7 @@ export default {
         let stdLowerBoundSerie = {
           name: this.stdLowerBoundTitle,
           type: 'line',
-          data: features.map(() => (meanRealValue - stdRealValue).toPrecision(3) ),
+          data: features.map(() => (meanPredictValue - stdPredictValue).toPrecision(3) ),
           lineStyle: {
             //opacity: 0
           },
@@ -567,7 +583,7 @@ export default {
         let stdUpperBoundSerie = {
           name: this.stdUpperBoundTitle,
           type: 'line',
-          data: features.map(() => (meanRealValue + stdRealValue).toPrecision(3)),
+          data: features.map(() => (meanPredictValue + stdPredictValue).toPrecision(3)),
           lineStyle: {
             //opacity: 0
           },
@@ -624,11 +640,6 @@ export default {
 
           odl.option.xAxis[0].data.push(dateString);
         });
-
-
-        //odl.option.xAxis[0].data = uniqueDates
-
-        //console.log(features.map(e => e.Start_measure), odl.option.xAxis[0])
       }
     },
     // Get uniq items
