@@ -1,11 +1,13 @@
 <template>
-  <v-container 
+  <v-container
+    fluid
+    fill-height
     ref="map-root"
     :geojsonBaseLayer="geojsonBaseLayer"
-    fluid
     class="pa-0"
-    style="height:90vh;width: 100%;position: relative;"
+    style="width: 100%;position: relative;"
   >
+
     <v-dialog
       v-model="loading"
       hide-overlay
@@ -52,7 +54,6 @@
   import Fill from 'ol/style/Fill'
   import Stroke from 'ol/style/Stroke'
   import Style from 'ol/style/Style'
-  //import Circle from 'ol/geom/Circle';
 
   export default {
     name: 'MapContainer',
@@ -65,7 +66,7 @@
         type: Array,
         require: true,
       },
-      effect: {
+      effect1: {
         type: Number,
         require: false,
       },
@@ -78,9 +79,8 @@
       vectorLayer: null,
       geojsonBaseLayer: DEU,
       localityCode: null,
-      odl_7days_Url: 'http://127.0.0.1:5000/odls/{locality_code}/7-days/{started}/{ended}',
       stationUrl: 'http://127.0.0.1:5000/stations',
-      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}/{effect}/{effect2}',
+      odlUrl: 'http://127.0.0.1:5000/prediction/{locality_code}/{started}/{ended}/{effect1}/{effect2}',
       loading: false,
       userLocation: null,
     }),
@@ -134,22 +134,19 @@
       },
       dates: {
         handler: function () {
-          if(this.localityCode)
-            this.getOdlFeatures(this.localityCode);
+            this.getOdlFeatures()
         },
         deep: true
       },
-      effect: {
+      effect1: {
         handler: function () {
-          if(this.localityCode)
-            this.getOdlFeatures(this.localityCode);
+          this.getOdlFeatures()
         },
         deep: true
       },
       effect2: {
         handler: function () {
-          if(this.localityCode)
-            this.getOdlFeatures(this.localityCode);
+            this.getOdlFeatures()
         },
         deep: true
       },
@@ -188,46 +185,33 @@
       setFeatures: function() {
         try 
         {
-          const self = this;
+          let self = this
 
           // Popup layer
-          const popupContainer = document.getElementById('popup');
+          const popupContainer = document.getElementById('popup')
 
           const popupOverlay = new Overlay({
             element: popupContainer,
             offset: [10, 10],
           });
 
-          this.olMap.addOverlay(popupOverlay);
+          this.olMap.addOverlay(popupOverlay)
           
-          let selected = null;
+          let selected = null
 
           this.olMap.on('pointermove', function (e) {
             if (selected !== null) {
-              selected.setStyle(undefined);
-              selected = null;
+              selected.setStyle(undefined)
+              selected = null
             }
             
             // set pop up
             this.forEachFeatureAtPixel(e.pixel, function (feature) {
-              selected = feature;
-
-              /* Set Style
-              const highlightStyle = new Style({
-                fill: new Fill({
-                  color: 'rgba(0,0,255,0.7)',
-                }),
-                stroke: new Stroke({
-                  color: 'rgba(0,0,0,1.0)',
-                  width: 2,
-                }),
-              });
-              feature.setStyle(highlightStyle);*/
-
+              selected = feature
               
               // Add popup
               //let localityCode = feature.get('Locality_code');
-              let localityName = feature.get('Locality_name');
+              let localityName = feature.get('Locality_name')
               //let geometry = feature.get('Geometry');
               var content = localityName ? 
               '<b>' + localityName + '</b>'
@@ -237,21 +221,21 @@
                   '<li><b>Code:</b> ' + localityCode + '</li>' +
                   '<li><b>Geometry:</b> [' + geometry + ']</li>' +
                 '</ul>'
-                */: null;
+                */: null
 
               if(content)
               {
-                popupContainer.innerHTML = content;
-                popupOverlay.setPosition(e.coordinate);
+                popupContainer.innerHTML = content
+                popupOverlay.setPosition(e.coordinate)
               }
 
-              return true;
+              return true
             });
 
             // Hide the popup
             if (selected === null) {
-              document.getElementById('popup').innerHTML = '';
-              popupOverlay.setPosition(null);
+              document.getElementById('popup').innerHTML = ''
+              popupOverlay.setPosition(null)
             }
             
           });
@@ -260,38 +244,28 @@
           this.olMap.on('click', function (e) {
 
             this.forEachFeatureAtPixel(e.pixel, function (feature) {
-              selected = feature;
 
-              //let local_authority = feature.get('local_authority');
+              // get selected point
+              selected = feature
 
-              self.localityCode = feature.get('Locality_code');
+              // provide a popoup content for hovering
+              self.localityCode = feature.get('Locality_code')
 
-              //let features = self.geojson.features.filter((n) => {
-                  //return n.properties.local_authority === local_authority;
-              //});
-
+              // trigger action by sending locality code
               if(self.localityCode)
-                self.getOdlFeatures(self.localityCode);
-              //self.getprecipitationFeatures(localityCode);
+                self.getOdlFeatures()
 
-              //self.$emit('odlFeature', features);
+              return true
+            })
 
-              return true;
-            });
-
-          });
-
+          })
           
         }catch (error) 
         {
-          console.log(error);
+          console.log(error)
         }
-
       },
-      // Get uniq items
-      onlyUnique: function (value, index, self) {
-        return self.indexOf(value) === index;
-      },
+      // get my current location
       getCurrentLocation: function (map, vectorSource) {
         if ('geolocation' in navigator) {
           navigator.geolocation.getCurrentPosition(position => {
@@ -330,14 +304,12 @@
           alert('Geolocation is not supported by your browser.');
         }
       },
-
       // get odl latest 7 days for selected locality_code
-      getOdlFeatures: async function(locality_code){
-
+      getOdlFeatures: async function(){
         let result = null;
 
         const localityCodeRegex = /{locality_code}/i;
-        let getFeatureUrl = this.odlUrl.replace(localityCodeRegex, locality_code)
+        let getFeatureUrl = this.odlUrl.replace(localityCodeRegex, this.localityCode)
 
         if(this.dates[0])
         {
@@ -351,8 +323,8 @@
           getFeatureUrl = getFeatureUrl.replace(endedRegex, this.dates[1])
         }
 
-        const effectRegex = /{effect}/i;
-        getFeatureUrl = getFeatureUrl.replace(effectRegex, this.effect)
+        const effect1Regex = /{effect1}/i;
+        getFeatureUrl = getFeatureUrl.replace(effect1Regex, this.effect1)
 
         const effect2Regex = /{effect2}/i;
         getFeatureUrl = getFeatureUrl.replace(effect2Regex, this.effect2)
@@ -365,35 +337,16 @@
             result = JSON.parse(result);
 
             this.$emit('odlFeature', result);
-          } )
+            }
+          )
+          .catch((error, message) => {
+              alert(error, message)
+            }
+          )
 
         this.loading = false;
-
-        //this.$emit('wfsResponse', JSON.parse(this.jsondata));
-        
-
-        //return JSON.parse(result);
       },
-      // get odl latest 7 days for selected locality_code
-      getprecipitationFeatures: async function(locality_code){
-
-        let result = null;
-
-        const regex = /{locality_code}/i;
-        let getFeatureUrl = this.odl_7days_Url.replace(regex, locality_code);
-
-        this.loading = true;
-        await fetch(getFeatureUrl)
-          .then(response => response.json())
-          .then(data => {
-            result = JSON.stringify(data);
-            result = JSON.parse(result);
-
-            this.$emit('precipitationFeature', result.features);
-          } )
-        this.loading = false;
-
-      },
+      // get all availabe stations
       getStations: async function(){
         this.loading = true;
 
@@ -402,6 +355,7 @@
         await fetch(this.stationUrl)
           .then(response => response.json())
           .then(data => { jsondata = JSON.stringify(data); } )
+          .catch(error => { alert(error) })
 
         this.loading = false;
 
@@ -425,32 +379,4 @@
     margin: 0;
     padding: 0;
   }
-
-
-/* loader */
-.loader {
-  border: 16px solid #888888;
-  border-radius: 50%;
-  border-top: 16px solid #3498db;
-  width: 100px;
-  height: 100px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
-  animation: spin 2s linear infinite;
-  position: absolute;
-  top: 45%;
-  left: 45%;
-  z-index: 100;
-}
-
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 </style>

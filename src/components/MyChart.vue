@@ -1,103 +1,88 @@
 <template>
 
-  <v-card class="mt-4">
-    <!--
-    <v-tabs
-      v-model="tab"
-      background-color="primary"
-      dark
+  <div>
+    <v-card class="mb-4" v-if="odlFeature && odlFeature.result">
+      <v-toolbar
+      flat
+      >
+        <v-spacer>Available Tools</v-spacer>
+          <v-card-actions class="w-auto">
+
+            <v-switch
+              v-if="odlFeature && odlFeature.falsePoints && odlFeature.falsePoints.length"
+              v-model="negativePointsActive"
+              label="Negative AGDR Slop"
+              color="red"
+              hide-details
+              flat
+              class="me-4"
+              @change="(value) => toggelMarkline(value, 'red')"
+            >
+            </v-switch>
+            <v-switch
+              v-if="odlFeature && odlFeature.truePoints && odlFeature.truePoints.length"
+              v-model="posetivePointsActive"
+              label="Posetive AGDR Slop"
+              color="green"
+              hide-details
+              flat
+              class="me-2"
+              @change="(value) => toggelMarkline(value, 'green')"
+            >
+            </v-switch>
+
+          </v-card-actions>
+        <v-btn icon @click="generateReport">
+          <v-icon>mdi-printer</v-icon>
+        </v-btn>
+
+      </v-toolbar>
+    </v-card>
+
+    <vue-html2pdf
+      :show-layout="true"
+      :float-layout="false"
+      :enable-download="false"
+      :preview-modal="true"
+      :paginate-elements-by-height="1400"
+      :filename="`${odlFeature ? odlFeature.localityName : null} ${ odlFeature && odlFeature.result ? moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm:ss') : 'started'}-${odlFeature && odlFeature.result ? moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm:ss') : 'ended'}`"
+      :pdf-quality="2"
+      :manual-pagination="true"
+      pdf-format="a3"
+      pdf-orientation="portrait"
+      pdf-content-width="auto"
+
+      @progress="onProgress($event)"
+      @hasStartedGeneration="hasStartedGeneration()"
+      @hasGenerated="hasGenerated($event)"
+      ref="html2Pdf"
     >
-      <v-tab
-        v-for="item in items"
-        :key="item.tab"
-      >
-        {{ item.tab }}
-      </v-tab>
-    </v-tabs>
+      <section slot="pdf-content" style="display:block" class="d-block">
+          <v-card>
+            <v-card flat>
+              <v-card-text :style="`display:${odlFeature && odlFeature.result ? 'block' : 'none'}`">
+                <div class="figure">
+                  <e-chart
+                    :option="odlOptions"
+                    :init-options="initOptions"
+                    ref="odl"
+                    autoresize
+                  />
+                </div>
+              </v-card-text>
 
-    <v-tabs-items v-model="tab">
-      <v-tab-item
-        :key="items[0].tab"
-      >
-      -->
-        <v-card flat>
-          <v-card-text>
-            
-            <div class="figure" :style="`display:${odlFeature && odlFeature.result ? 'block' : 'none'}`">
-              <e-chart
-                :option="odlOptions"
-                :init-options="initOptions"
-                ref="odl"
-                autoresize
-              />
-            </div>
-          </v-card-text>
+              <v-card-subtitle style="text-align: justify" v-if="odlFeature && odlFeature.result">
+                <h2 class="my-2">Interpretation of the diagram</h2>
 
-          <v-card-subtitle style="text-align: justify" v-if="odlFeature">
-          <h2 class="my-2">Interpretation of the diagram</h2>
+                <v-divider class="mb-2"></v-divider>
 
-            <v-divider class="mb-2"></v-divider>
-
-            <span>This is a chart showing the 
-              <b :style="`color:${odlOptions.color[6]}`" @mouseover="hoverLegend(realTitle)">{{ realTitle }}</b> and 
-              <b :style="`color:${odlOptions.color[5]}`" @mouseover="hoverLegend(predictionTitle)">{{ predictionTitle }}</b>
-               value of Ambient Gamma Dose Rates(AGDR) and 
-               Precipitation
-               <b :style="`color:${odlOptions.color[4]}`" @mouseover="hoverLegend(precipitationTitle)">{{ precipitationTitle }}</b>
-                in 7 days from
-              <u>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <strong
-                      class="d-inline-block"
-                      v-bind="attrs"
-                      v-on="on"
-                      @mouseover="hoverOver([Math.min(...odlFeature.result.map(e => e.end_measure))])"
-                    >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
-                  </template>
-                  <span>{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
-                </v-tooltip>
-              </u>
-              to 
-              <u>
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <strong
-                      class="d-inline-block"
-                      v-bind="attrs"
-                      v-on="on"
-                      @mouseover="hoverOver([Math.max(...odlFeature.result.map(e => e.end_measure))])"
-                    >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
-                  </template>
-                  <span>{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
-                </v-tooltip>
-              </u>
-              in
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <strong
-                    class="d-inline-block text-uppercase"
-                    v-bind="attrs"
-                    v-on="on"
-                  >{{ odlFeature.localityName }}</strong>
-                </template>
-                <span>{{ odlFeature.localityCode }}</span>
-              </v-tooltip>
-              .
-            </span>
-            To identify deviations from the normal range of AGDR (Ambient Gamma Dose Rate), a yellow boundary is displayed around the predicted value. This boundary serves as an indicator where the AGDR exceeds the expected value, suggesting a potential anomaly. Additionally, there are red and green lines representing the 
-            upper
-            <b :style="`color:${odlOptions.color[3]}`" @mouseover="hoverLegend(maxTitle)">{{ maxTitle }}</b>
-             and 
-            <b :style="`color:${odlOptions.color[2]}`" @mouseover="hoverLegend(minTitle)">{{ minTitle }}</b> 
-             limits of the AGDR range. These lines provide an approximate range for the natural ambient dose rate. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
-             Furthermore, we can evaluate the hypothesis regarding the relationship between increased precipitation and AGDR by comparing the gradients of the predicted values with those of the actual values.
-             <span v-if="(odlFeature.falsePoints && odlFeature.falsePoints.length) || (odlFeature.truePoints && odlFeature.truePoints.length)"> For instance, </span>
-            <span v-if="odlFeature.falsePoints && odlFeature.falsePoints.length">at the given timestamps of
-              <span v-for="(badPoint, index) in odlFeature.falsePoints" :key="badPoint">
-                <span v-if="!index"></span>
-                <span v-else-if="index+1 != odlFeature.falsePoints.length">, </span>
-                <span v-else> and </span>
+                <p>
+                  This is a chart showing the 
+                  <b :style="`color:${odlOptions.color[6]}`" @mouseover="hoverLegend(realTitle)">{{ realTitle }}</b>, 
+                  <b :style="`color:${odlOptions.color[5]}`" @mouseover="hoverLegend(predictionTitle)">{{ predictionTitle }}</b>
+                  and 
+                  <b :style="`color:${odlOptions.color[4]}`" @mouseover="hoverLegend(precipitationTitle)">{{ precipitationTitle }}</b>
+                    in 7 days from
                   <u>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
@@ -105,170 +90,176 @@
                           class="d-inline-block"
                           v-bind="attrs"
                           v-on="on"
-                          @mouseover="hoverOver([badPoint])"
-                        >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                          @mouseover="hoverOver(odlFeature && odlFeature.result ? [Math.min(...odlFeature.result.map(e => e.end_measure))] : [])"
+                        >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
                       </template>
-                      <span>{{ moment(badPoint * 1000).fromNow() }}</span>
+                      <span>{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
                     </v-tooltip>
                   </u>
-              </span>
-            </span>
-            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length && odlFeature.falsePoints && odlFeature.falsePoints.length">, depicted by</span>
-            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">
-              the 
-              <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <strong
-                    class="d-inline-block red--text"
-                    v-bind="attrs"
-                    v-on="on"
-                  >red dotted lines</strong>
-                </template>
-                <span>{{ odlFeature.falsePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
-              </v-tooltip>
-                , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction indicating there might be effect of other external elemt rather than precipitation. Conversely, when we observe the 
-                <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <strong
-                    class="d-inline-block green--text"
-                    v-bind="attrs"
-                    v-on="on"
-                  >green dotted lines</strong>
-                </template>
-                <span>{{ odlFeature.truePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
-              </v-tooltip>
-                 at 
-              <span v-for="(goodPoint, index) in odlFeature.truePoints" :key="goodPoint">
-                <span v-if="!index"></span>
-                <span v-else-if="index+1 != odlFeature.truePoints.length">, </span>
-                <span v-else> and </span>
-                <u>
+                  to 
+                  <u>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <strong
+                          class="d-inline-block"
+                          v-bind="attrs"
+                          v-on="on"
+                          @mouseover="hoverOver([Math.max(...odlFeature.result.map(e => e.end_measure))])"
+                        >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                      </template>
+                      <span>{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
+                    </v-tooltip>
+                  </u>
+                  in
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
                       <strong
-                        class="d-inline-block"
+                        class="d-inline-block text-uppercase"
                         v-bind="attrs"
                         v-on="on"
-                        @mouseover="hoverOver([goodPoint])"
-                      >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                      >{{ odlFeature.localityName }}</strong>
                     </template>
-                    <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
-                  </v-tooltip>
-                </u>
-              </span>
-            </span>
-            <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">, as the predicted and actual values exhibit a similar increasing pattern in their slopes.</span>
-            This observation is further supported by the presence of precipitation, indicated by the evidence of increased AGDR, thereby strengthening the hypothesis that the rise in AGDR is attributed to heightened precipitation.
-          </v-card-subtitle>
-          <v-card-title v-else>
-            <v-row>
-              <v-col cols="10" class="ma-auto">
-                Is the level of Ambient Gamma Dose Rate (AGDR) dangerously elevated in Germany?
-                <v-divider class="mb-5"></v-divider>
-                <v-card-text>
-                  <p>
+                    <span>{{ odlFeature.localityCode }}</span>
+                  </v-tooltip>.
+                </p>
+                <p>
+                  In order to detect deviations of AGDR caused by rainfall, a yellow boundary
+                  (
+                    <b :style="`color:${odlOptions.color[1]}`" @mouseover="hoverLegend(stdLowerBoundTitle)">{{ stdLowerBoundTitle }}</b>
+                    -
+                    <b :style="`color:${odlOptions.color[0]}`" @mouseover="hoverLegend(stdUpperBoundTitle)">{{ stdUpperBoundTitle }}</b>
+                  )
+                  is presented around the predicted value. This boundary acts as an indicator when the AGDR surpasses the anticipated value, indicating the potential impact of external factors.
+                </p>
+                <p>Additionally, there are red and green lines representing the 
+                  <b :style="`color:${odlOptions.color[3]}`" @mouseover="hoverLegend(maxTitle)">{{ maxTitle }}</b>
+                  and 
+                  <b :style="`color:${odlOptions.color[2]}`" @mouseover="hoverLegend(minTitle)">{{ minTitle }}</b> 
+                  of the AGDR range. These lines provide an approximate range for the natural AGDR. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
+                </p>
+                <p v-if="(odlFeature.truePoints && odlFeature.truePoints.length) || (odlFeature.falsePoints && odlFeature.falsePoints.length)">
+                  Furthermore, we can evaluate the hypothesis regarding the relationship between increased precipitation and AGDR by comparing the gradients of the predicted values with those of the actual values.
+                  <span v-if="(odlFeature.falsePoints && odlFeature.falsePoints.length) || (odlFeature.truePoints && odlFeature.truePoints.length)"> For instance, </span>
+                  <span v-if="odlFeature.falsePoints && odlFeature.falsePoints.length">at the given timestamps of
+                    <span v-for="(badPoint, index) in odlFeature.falsePoints" :key="badPoint">
+                      <span v-if="!index"></span>
+                      <span v-else-if="index+1 != odlFeature.falsePoints.length">, </span>
+                      <span v-else> and </span>
+                        <u>
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <strong
+                                class="d-inline-block red--text"
+                                v-bind="attrs"
+                                v-on="on"
+                                @mouseover="hoverOver([badPoint])"
+                              >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                            </template>
+                            <span>{{ moment(badPoint * 1000).fromNow() }}</span>
+                          </v-tooltip>
+                        </u>
+                    </span>
+                  </span>
+                  <span v-if="odlFeature.truePoints && odlFeature.truePoints.length && odlFeature.falsePoints && odlFeature.falsePoints.length">, depicted by</span>
+                  <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">
+                    the 
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <strong
+                          class="d-inline-block red--text"
+                          v-bind="attrs"
+                          v-on="on"
+                        >red dotted lines</strong>
+                      </template>
+                      <span>{{ odlFeature.falsePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                    </v-tooltip>
+                      , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction indicating there might be effect of other external elemt rather than precipitation. Conversely, when we observe the 
+                      <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <strong
+                          class="d-inline-block green--text"
+                          v-bind="attrs"
+                          v-on="on"
+                        >green dotted lines</strong>
+                      </template>
+                      <span>{{ odlFeature.truePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                    </v-tooltip>
+                      at 
+                    <span v-for="(goodPoint, index) in odlFeature.truePoints" :key="goodPoint">
+                      <span v-if="!index"></span>
+                      <span v-else-if="index+1 != odlFeature.truePoints.length">, </span>
+                      <span v-else> and </span>
+                      <u>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <strong
+                              class="d-inline-block green--text"
+                              v-bind="attrs"
+                              v-on="on"
+                              @mouseover="hoverOver([goodPoint])"
+                            >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                          </template>
+                          <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
+                        </v-tooltip>
+                      </u>
+                    </span>
+                  </span>
+                  <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">, it is shown the predicted and actual values exhibit a similar increasing pattern in their slopes.</span>
+                  This observation is further supported by an increase of precipitation, indicated by the evidence of increased AGDR, thereby strengthening the hypothesis that the rise in AGDR is attributed to heightened precipitation.
+                </p>
+              </v-card-subtitle>
 
-                    This project involves the development of a web-based spatial decision support system designed to assist doctors and policymakers in assessing the risk level of gamma ambient dose rate in Germany. The purpose of this application, developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," is to provide a comprehensive tool for analyzing and visualizing the gamma ambient dose rate data. The system is evaluated using this application, which has been specifically commissioned by BfS (Federal Office for Radiation Protection) 
-                  </p><p>
-                    for this purpose. Its primary aim is to empower medical professionals and policymakers with valuable insights into the risk levels associated with gamma ambient dose rates across different regions in Germany.
-                  </p><p>
-                    It is worth noting that, according to a BfS report considering local conditions, the usual range for natural ambient radiation dose rate in Germany is between 0.05 and 0.18 μSv/h. Typically, external radiation exposure remains fairly constant; however, certain external factors, such as rain, can cause minor and temporary fluctuations in the local dose rate, resulting in slight increases or decreases.
-                  </p><p>
-                    In order to determine if the elevated AGDR levels pose a danger, one solution is to demonstrate that the increase in AGDR is attributed to precipitation and falls within a safe range. To accomplish this, we utilize advanced data mining techniques and machine learning algorithms to establish a definitive relationship between AGDR and precipitation. The outcomes reveal encouraging correlations. This application leverages these data mining discoveries as a predictive and simulation model, presented through an interactive and user-friendly platform. This empowers doctors and policymakers to make well-informed decisions by analyzing these results.
-                  </p><p>
-                    Upon selecting each station, target users will be presented with advanced data visualization featuring interpretations, as well as prediction and simulation tools. It should be noted that 
-                  </p>
+              <v-card-title v-else>
+                <v-row>
+                  <v-col cols="12" class="ma-auto">
+                    Is the level of Ambient Gamma Dose Rate (AGDR) dangerously elevated in Germany?
+                    <v-divider></v-divider>
+                    <v-card-text>
+                      <p>
+                        This project involves the development of a web-based spatial decision support system designed to assist doctors and policymakers in assessing the risk level of Ambient Gamma Dose Rate (AGDR) in Germany. The purpose of this application, developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," provides a comprehensive tool for analyzing and visualizing gamma ambient dose rate data. The system is evaluated using this application, which has been specifically commissioned by the Bundesamt für Strahlenschutz (BfS).
+                      </p><p>
+                        In order to assess the potential risk posed by elevated AGDR levels, one approach is to demonstrate that the increase in AGDR is caused by external factors and remains within a safe range. According to a report from BfS, under natural circumstances, AGDR can experience a temporary increase of up to twice its normal level when radioactive decay products of radon are washed out of the atmosphere by precipitation and subsequently deposited on the ground.
+                      </p><p>
+                        The objective of this project is to provide medical professionals and policymakers with valuable insights regarding AGDR risk levels. This is accomplished by employing advanced data mining techniques to establish a definitive relationship between AGDR and precipitation.
+                      </p><p>
+                        AGDR data was collected by BfS measurement stations. Collaboratively with Germany's National Meteorological Service, precipitation data has been obtained from weather radar technology provided by BfS. Both datasets are time series. We have assessed the relationship between AGDP and precipitation, as well as precipitation occurring two hours prior (considering the time series nature of the data and the possibility of a 2-hour delay on AGDR) and seasonal effects. The findings demonstrate promising correlations. Utilizing these data mining discoveries, an interactive and user-friendly platform has been developed as a predictive and simulation model. This platform empowers doctors and policymakers to make well-informed decisions by examining these results.
+                      </p><p>
+                        Once a station is chosen, the intended users will have access to sophisticated data visualizations that include interpretations, prediction capabilities, and simulation tools. With respect to the prediction and simulation tools, users can select their desired time of year to view the prediction model. Furthermore, there are two dropdown menus available that enable users to simulate rainfall impact by adjusting a multiplier ranging from 0 to 2. Additionally, using the same tool and format, users can examine the effects of precipitation occurring two hours prior.
+                      </p>
 
-                  <v-carousel class="my-6">
-                    <v-carousel-item
-                      src="../assets/1.jpeg"
-                      reverse-transition="fade-transition"
-                      transition="fade-transition"
-                    ></v-carousel-item>
-                    <v-carousel-item
-                      src="../assets/2.jpeg"
-                      reverse-transition="fade-transition"
-                      transition="fade-transition"
-                    ></v-carousel-item>
-                  </v-carousel>
+                      <v-carousel class="mt-4">
+                        <v-carousel-item
+                          src="../assets/1.jpeg"
+                          reverse-transition="fade-transition"
+                          transition="fade-transition"
+                        ></v-carousel-item>
+                        <v-carousel-item
+                          src="../assets/2.jpeg"
+                          reverse-transition="fade-transition"
+                          transition="fade-transition"
+                        ></v-carousel-item>
+                      </v-carousel>
 
-                </v-card-text>
-                
-              </v-col>
-            </v-row>
-          </v-card-title>
+                    </v-card-text>
+                    
+                  </v-col>
+                </v-row>
+              </v-card-title>
 
-          <v-card-actions>
-            <v-row
-              no-gutters
-              align="center"
-            >
-              <v-col cols="6" class="d-flex justify-start">
-                <v-switch
-                  v-model="negativePointActive"
-                  label="red"
-                  color="red"
-                  value="red"
-                  hide-details
-                  flat
-                  inset
-                >
-                </v-switch>
-              </v-col>
+            </v-card>
+          </v-card>
 
-            </v-row>
-          </v-card-actions>
-        </v-card>
+        <!-- PDF Content Here -->
+      </section>
+    </vue-html2pdf>
 
-        <!--
-      </v-tab-item>
-
-      
-      <v-tab-item
-        :key="items[1].tab"
-      >
-
-        <v-table height="200px">
-          <thead>
-            <tr>
-              <th class="text-left">
-                Timestamp
-              </th>
-              <th class="text-left">
-                Actual
-              </th>
-              <th class="text-left">
-                Forecasted
-              </th>
-              <th class="text-left">
-                Absolute Percent Error
-              </th>
-            </tr>
-          </thead>
-          <tbody v-if="odlFeature && odlFeature.result">
-            <tr
-              v-for="item in odlFeature.result"
-              :key="item.end_measure"
-            >
-              <td>{{ new Date(item.end_measure * 1000).toLocaleString() }}</td>
-              <td>{{ (Math.round(item.odl_real * 1000) / 1000).toFixed(3) }}</td>
-              <td>{{ (Math.round(item.odl_prediction * 1000) / 1000).toFixed(3) }}</td>
-              <td>{{ item.absolute_percent_error.toFixed(1) }}%</td>
-            </tr>
-          </tbody>
-        </v-table>
-      
-
-      </v-tab-item>
-    
-    </v-tabs-items>-->
-  </v-card>
+  </div>
 
 </template>
 
 <script>
 
-//import * as echarts from 'echarts'
+import VueHtml2pdf from 'vue-html2pdf'
 import EChart ,{ THEME_KEY } from 'vue-echarts'
 
 import { CanvasRenderer } from "echarts/renderers";
@@ -303,13 +294,13 @@ use([
 export default {
   name: 'MyChart',
   components: {
-    EChart
+    EChart,
+    VueHtml2pdf
   },
   provide: {
     [THEME_KEY]: "light"
   },
   props: {
-    precipitationFeature: [],
     odlFeature: [],
     dates: {
       type: Array,
@@ -319,15 +310,9 @@ export default {
   data() {
     return {
       odlOptions: { ...line},
-      precipitationOptions: { ...line},
       initOptions: {
         renderer: "canvas"
       },
-      tab: null,
-      items: [
-        { tab: 'Chart View', content: '' },
-        { tab: 'List View', content: '' },
-      ],
       maxRealValue: 0.18,
       minRealValue: 0.05,
       moment,
@@ -341,135 +326,88 @@ export default {
       stdLowerBoundTitle: 'Standard deviation lower',
       maxTitle: 'High AGDR limit',
       minTitle: 'Low AGDR limit',
+      negativePointsActive: true,
+      posetivePointsActive: true,
+      posetiveMarklines: null, 
+      negativeMarklines: null,
     }
   },
-  mounted() {
-    //this.fillprecipitation();
-    this.fillOdl();
-
-    this.$nextTick(() => {
-      const chartInstance = this.$refs.odl.chart;
-      // Use the chartInstance as needed
-      this.echartInstance = chartInstance;
-    });
-  },
   watch: {
-    precipitationFeature: {
-      handler: function () {
-        //this.fillprecipitation();
-      },
-      deep: true,
-    },
     odlFeature: {
       handler: function () {
         this.fillOdl();
       },
-      deep: true,
+      deep: false,
     },
   },
   methods:
   {
-    fillprecipitation() {
-      
-      //let dataIndex = -1;
-      let precipitation = this.$refs.precipitation;
-
-      //let uniqueNuclide;
-
-      if (!precipitation)
-        return;
-
-      // Make data for chart
-      let features = this.precipitationFeature;
-
-      if(features && features !== undefined)
-      {
-        ////////////////////////////////////////////////////precipitation//////////////////////////////////////////////////////
-        // Erase old data from precipitation
-        precipitation.option.legend.data = [];
-        precipitation.option.xAxis.forEach(e => e.data = []);
-        precipitation.option.series = [];
-        precipitation.setOption(this.precipitationOptions, true);
-
-        // Make new data from precipitation
-        precipitation.option.title.text = features[0].properties.name + " : " + features[0].properties.id;
-        precipitation.option.yAxis[0].name = features[0].properties.unit;
-
-        /* Get uniq dates */
-        var uniqueDates = features.map(e => e.properties.start_measure).filter(this.onlyUnique);
-
-        let serieName = features[0].properties.nuclide;
-
-        // Add Nuclids as series
-        let newSerie = {
-          name: serieName,
-          type: 'line',
-          data: features.map(e => e.properties.value),
-        }
-
-        precipitation.option.legend.data.push(serieName);
-        precipitation.option.series.push(newSerie);
-
-        // Create XAxis labels
-        uniqueDates.forEach(date => {
-          
-          let d = new Date(date);
-          let ye = new Intl.DateTimeFormat('en', { year: '2-digit' }).format(d);
-          let mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(d);
-          let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
-
-          var xAxisTitle = `${da}${mo}${ye}`;
-
-          // Add labels of xAxis
-          precipitation.option.xAxis[0].data.push(xAxisTitle);
-        });
-      }
+    generateReport () {
+      this.$refs.html2Pdf.generatePdf()
     },
     fillOdl() {
+      const chartInstance = this.$refs.odl.chart
 
-      //let precipitation = this.$refs.precipitation;
-      let odl = this.$refs.odl;
-      let odlOptions = this.odlOptions;
+      // Use the chartInstance as needed
+      this.echartInstance = chartInstance
+
+      let odl = this.$refs.odl
+      let odlOptions = this.odlOptions
 
       if (!odl || !this.odlFeature)
         return;
 
       // Make data for chart
-      let features = this.odlFeature.result;
+      let features = this.odlFeature.result
 
       //console.log(features)
 
-      let falsePoints = this.odlFeature.falsePoints;
-      let truePoints = this.odlFeature.truePoints;
+      let falsePoints = this.odlFeature.falsePoints
+      let truePoints = this.odlFeature.truePoints
       //let localityCode = this.odlFeature.localityCode;
-      let localityName = this.odlFeature.localityName;
-      let meanPredictValue = this.odlFeature.meanPredictValue;
-      let stdPredictValue = this.odlFeature.stdPredictValue;
+      let localityName = this.odlFeature.localityName
+      let meanPredictValue = this.odlFeature.meanPredictValue
+      let stdPredictValue = this.odlFeature.stdPredictValue
       //let mape = this.odlFeature.mape;
 
       if(features && features.length)
       {
-        ////////////////////////////////////////////////////odl//////////////////////////////////////////////////////
         // Erase old data from odl
-        odl.option.legend.data = [];
-        odl.option.xAxis.forEach(e => e.data = []);
-        odl.option.series = [];
-        odl.setOption(odlOptions, true);
+        odl.option.legend.data = []
+        odl.option.xAxis.forEach(e => e.data = [])
+        odl.option.series = []
+        odl.setOption(odlOptions, true)
 
         /* Get uniq dates */
-        var uniqueDates = features.map(e => e.end_measure).filter(this.onlyUnique);
+        var uniqueDates = features.map(e => e.end_measure).filter(this.onlyUnique)
 
         // Make new data from odl
-        odl.option.title.text = `${localityName}`;
+        odl.option.title.text = `${localityName}`
         //odl.option.yAxis[0].name = 'Gamma-ODL-Brutto';
         //precipitation.option.title.text = features[0].Locality_code;
         //precipitation.option.yAxis[0].name = 'precipitation';
 
-        let predictionKey = 'odl_prediction';
-        let realKey = 'odl_real';
-        let precipitationKey = 'precipitation';
-        //let stdUpperBoundKey = 'mae_upper_bound';
-        //let stdLowerBoundKey = 'mae_lower_bound';
+        let predictionKey = 'odl_prediction'
+        let realKey = 'odl_real'
+        let precipitationKey = 'precipitation'
+        //let stdUpperBoundKey = 'mae_upper_bound'
+        //let stdLowerBoundKey = 'mae_lower_bound'
+
+        this.posetiveMarklines = {
+            name: 'green',
+            symbol: ['none', 'none'],
+            label: { show: false },
+            lineStyle: { color: 'green'},
+            data: truePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+          }
+
+        this.negativeMarklines = {
+            name: 'red',
+            symbol: ['none', 'none'],
+            label: { show: false },
+            lineStyle: { color: 'red'},
+            data: falsePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+          }
 
         odl.option.yAxis = [];
         odl.option.yAxis.push(
@@ -521,12 +459,7 @@ export default {
           lineStyle: {
             width: 3
           },
-          markLine: {
-            symbol: ['none', 'none'],
-            label: { show: false },
-            lineStyle: { color: 'red'},
-            data: falsePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
-          },
+          markLine: {...this.negativeMarklines} , //red dotted lines
         }
 
         let predictionSerie = {
@@ -538,12 +471,7 @@ export default {
           lineStyle: {
             width: 3
           },
-          markLine: {
-            symbol: ['none', 'none'],
-            label: { show: false },
-            lineStyle: { color: 'green'},
-            data: truePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
-          },
+          markLine: {...this.posetiveMarklines}, //green dotted lines
         }
 
         let precipitationSerie = {
@@ -568,16 +496,17 @@ export default {
           name: this.stdLowerBoundTitle,
           type: 'line',
           data: features.map(() => (meanPredictValue - stdPredictValue).toPrecision(3) ),
-          lineStyle: {
+          //lineStyle: {
             //opacity: 0
-          },
-          areaStyle: {
-            opacity: 0
+          //},
+          //areaStyle: {
+            //opacity: 0
             //color: '#f5f5f5'
-          },
+          //},
           //stack: 'std-band',
-          symbol: 'none',
-          label: { show:false},
+          symbol: 'pin',
+          //label: { show:false},
+          showSymbol: false,
         }
 
         let stdUpperBoundSerie = {
@@ -592,7 +521,8 @@ export default {
             //color: '#ccc'
           },
           //stack: 'std-band',
-          symbol: 'none'
+          symbol: 'pin',
+          showSymbol: false,
         }
 
         let maxSerie = {
@@ -641,6 +571,9 @@ export default {
           odl.option.xAxis[0].data.push(dateString);
         });
       }
+
+      this.negativePointsActive = true
+      this.posetivePointsActive = true
     },
     // Get uniq items
     onlyUnique: function (value, index, self) {
@@ -658,7 +591,7 @@ export default {
       const chart = this.echartInstance;
 
       /* Get uniq dates */
-      var uniqueDates = this.odlFeature.result.map(e => e.end_measure).filter(this.onlyUnique);
+      var uniqueDates = this.odlFeature && this.odlFeature.result ? this.odlFeature.result.map(e => e.end_measure).filter(this.onlyUnique) : [];
 
       /* Find index of hovering timestamps */
       let indexOfTimestamps = uniqueDates
@@ -678,8 +611,6 @@ export default {
       // Access the chart instance and trigger the hover effect on the x-axis
       const chart = this.echartInstance;
 
-      console.log(legendTitle)
-
       // 显示 legend 
       chart.dispatchAction({
           type: 'legendUnSelect',
@@ -692,6 +623,28 @@ export default {
           // legend name
           name: legendTitle
       })
+    },
+    toggelMarkline:function (value, marklineName){
+      // Access the chart instance and trigger the hover effect on the x-axis
+      let odl = this.$refs.odl
+      
+      let serieName = ''
+
+      if(marklineName == 'red')
+        serieName = this.realTitle
+      else
+        serieName = this.predictionTitle
+
+      let data = []
+      if(value)
+      {
+        if(serieName == this.realTitle)
+          data = [...this.negativeMarklines.data]
+        else
+          data = [...this.posetiveMarklines.data]
+      }
+
+      odl.option.series.find(e => e.name === serieName).markLine.data = data
     },
   }
 }
@@ -706,7 +659,7 @@ export default {
     min-height: 100%;
 
     display: block;
-    width: 582px;
+    width: 100%;
     height: 60vh;
   }
 

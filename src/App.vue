@@ -15,9 +15,8 @@
             <map-container 
               :geojson="geojson"
               :dates="dates"
-              :effect="effect"
+              :effect1="effect1"
               :effect2="effect2"
-              @precipitationFeature="precipitationFeatureCallback"
               @odlFeature="odlFeatureCallback"
               @stationResponse="stationResponseMethod">
             </map-container>
@@ -28,13 +27,12 @@
               :filter="filter"
               :dates="dates"
               @datesUpdated="datesCallback"
-              @effectUpdated="effectCallback"
+              @effect1Updated="effect1Callback"
               @effect2Updated="effect2Callback"
               >
             </my-filter>
             <my-chart 
               :dates="dates"
-              :precipitationFeature="precipitationFeature"
               :odlFeature="odlFeature"
               >
             </my-chart>
@@ -68,30 +66,21 @@
               </v-card-title>
 
               <v-card-text>
-                  <p>
-                    The aim of this project is to develop a web-based Spatial Decision Support System (SDSS) that addresses a range of spatial problems by leveraging previous research and relevant aspects related to this study. The primary goal of the system is to provide decision-makers with a robust tool for solving spatial problems, with a specific focus on overcoming the challenges discussed in detail earlier. To evaluate the effectiveness and practicality of the proposed system, a comprehensive case study will be conducted in collaboration with Bundesamt für Strahlenschutz (BfS), a prominent organization in Germany.
-                  </p><p>
-                    In recent years, there has been significant attention devoted to investigating the relationship between ambient gamma dose rate on the ground and precipitation, particularly within the context of BfS's research. As part of their extensive measurement activities, the BfS has diligently tracked environmental radioactivity levels throughout Germany, leading to the observation that the ambient gamma dose rate is correlated with precipitation levels.
-                  </p><p>
-                    It is well-known that ionizing radiation, such as gamma radiation, can pose risks to human health and the environment, especially when the exposure levels are high. The BfS has reported that external factors such as rain can influence the intensity of the local dose rate. This phenomenon occasionally leads to a temporary doubling of the normal dose rate.
-                  </p><p>
-                    This information holds critical importance for public safety, as it enables individuals to comprehend the variations in radiation levels across different regions and under diverse weather conditions. Understanding these differences is crucial for ensuring appropriate measures are taken to protect public health.
-                  </p><p>
-                    By developing a web-based SDSS that integrates and analyzes relevant data on ambient gamma dose rate and precipitation, this project aims to provide an effective solution to support decision-making processes, enhance public safety, and enable informed actions related to radiation protection.
-                  </p>
-
-                  <v-carousel class="my-6">
-                    <v-carousel-item
-                      src="assets/1.jpeg"
-                      reverse-transition="fade-transition"
-                      transition="fade-transition"
-                    ></v-carousel-item>
-                    <v-carousel-item
-                      src="assets/2.jpeg"
-                      reverse-transition="fade-transition"
-                      transition="fade-transition"
-                    ></v-carousel-item>
-                  </v-carousel>
+                <v-row>
+                  <v-col class="ma-auto">
+                    <p>
+                      This project involves the development of a web-based spatial decision support system designed to assist doctors and policymakers in assessing the risk level of Ambient Gamma Dose Rate (AGDR) in Germany. The purpose of this application, developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," provides a comprehensive tool for analyzing and visualizing gamma ambient dose rate data. The system is evaluated using this application, which has been specifically commissioned by the Bundesamt für Strahlenschutz (BfS).
+                    </p><p>
+                      In order to assess the potential risk posed by elevated AGDR levels, one approach is to demonstrate that the increase in AGDR is caused by external factors and remains within a safe range. According to a report from BfS, under natural circumstances, AGDR can experience a temporary increase of up to twice its normal level when radioactive decay products of radon are washed out of the atmosphere by precipitation and subsequently deposited on the ground.
+                    </p><p>
+                      The objective of this project is to provide medical professionals and policymakers with valuable insights regarding AGDR risk levels. This is accomplished by employing advanced data mining techniques to establish a definitive relationship between AGDR and precipitation.
+                    </p><p>
+                      AGDR data was collected by BfS measurement stations. Collaboratively with Germany's National Meteorological Service, precipitation data has been obtained from weather radar technology provided by BfS. Both datasets are time series. We have assessed the relationship between AGDP and precipitation, as well as precipitation occurring two hours prior (considering the time series nature of the data and the possibility of a 2-hour delay on AGDR) and seasonal effects. The findings demonstrate promising correlations. Utilizing these data mining discoveries, an interactive and user-friendly platform has been developed as a predictive and simulation model. This platform empowers doctors and policymakers to make well-informed decisions by examining these results.
+                    </p><p>
+                      Once a station is chosen, the intended users will have access to sophisticated data visualizations that include interpretations, prediction capabilities, and simulation tools. With respect to the prediction and simulation tools, users can select their desired time of year to view the prediction model. Furthermore, there are two dropdown menus available that enable users to simulate rainfall impact by adjusting a multiplier ranging from 0 to 2. Additionally, using the same tool and format, users can examine the effects of precipitation occurring two hours prior.
+                    </p>
+                  </v-col>
+                </v-row>
 
                 </v-card-text>
 
@@ -130,7 +119,6 @@ import MapContainer from './components/MapContainer'
     },
     data: () => ({
       geojson: undefined,
-      precipitationFeature: undefined,
       odlFeature: undefined,
       dialog: false,
       filter: {
@@ -140,7 +128,7 @@ import MapContainer from './components/MapContainer'
         (new Date(new Date().setDate(new Date().getDate() - 7) - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
         (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
       ],
-      effect: 1.0,
+      effect1: 1.0,
       effect2: 1.0,
     }),
     methods:
@@ -148,17 +136,14 @@ import MapContainer from './components/MapContainer'
       stationResponseMethod: function(value){
         this.geojson = value;
       },
-      precipitationFeatureCallback: function(value){
-        this.precipitationFeature = value;
-      },
       odlFeatureCallback: function(value){
         this.odlFeature = value;
       },
       datesCallback: function(value){
         this.dates = value;
       },
-      effectCallback: function(value){
-        this.effect = value;
+      effect1Callback: function(value){
+        this.effect1 = value;
       },
       effect2Callback: function(value){
         this.effect2 = value;
