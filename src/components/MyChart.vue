@@ -5,13 +5,13 @@
       <v-toolbar
       flat
       >
-        <v-spacer>Available Tools</v-spacer>
+        <v-spacer>Toolbox</v-spacer>
           <v-card-actions class="w-auto">
 
             <v-switch
               v-if="odlFeature && odlFeature.falsePoints && odlFeature.falsePoints.length"
               v-model="negativePointsActive"
-              label="Negative AGDR Slop"
+              label="Negative Real AGDR Slop"
               color="red"
               hide-details
               flat
@@ -22,7 +22,7 @@
             <v-switch
               v-if="odlFeature && odlFeature.truePoints && odlFeature.truePoints.length"
               v-model="posetivePointsActive"
-              label="Posetive AGDR Slop"
+              label="Posetive Real AGDR Slop"
               color="green"
               hide-details
               flat
@@ -45,7 +45,7 @@
       :enable-download="false"
       :preview-modal="true"
       :paginate-elements-by-height="1400"
-      :filename="`${odlFeature ? odlFeature.localityName : null} ${ odlFeature && odlFeature.result ? moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm:ss') : 'started'}-${odlFeature && odlFeature.result ? moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm:ss') : 'ended'}`"
+      :filename="`${odlFeature ? odlFeature.localityName : null} ${ odlFeature && odlFeature.result ? moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm') : 'started'}-${odlFeature && odlFeature.result ? moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format('y-MM-DD HH:mm') : 'ended'}`"
       :pdf-quality="2"
       :manual-pagination="true"
       pdf-format="a3"
@@ -91,7 +91,7 @@
                           v-bind="attrs"
                           v-on="on"
                           @mouseover="hoverOver(odlFeature && odlFeature.result ? [Math.min(...odlFeature.result.map(e => e.end_measure))] : [])"
-                        >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                        >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm") }}</strong>
                       </template>
                       <span>{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
                     </v-tooltip>
@@ -105,7 +105,7 @@
                           v-bind="attrs"
                           v-on="on"
                           @mouseover="hoverOver([Math.max(...odlFeature.result.map(e => e.end_measure))])"
-                        >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                        >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm") }}</strong>
                       </template>
                       <span>{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
                     </v-tooltip>
@@ -123,22 +123,22 @@
                   </v-tooltip>.
                 </p>
                 <p>
-                  In order to detect deviations of AGDR caused by rainfall, a yellow boundary
+                  In order to detect deviations of the {{ realTitle }} caused by rainfall, a yellow boundary
                   (
                     <b :style="`color:${odlOptions.color[1]}`" @mouseover="hoverLegend(stdLowerBoundTitle)">{{ stdLowerBoundTitle }}</b>
                     -
                     <b :style="`color:${odlOptions.color[0]}`" @mouseover="hoverLegend(stdUpperBoundTitle)">{{ stdUpperBoundTitle }}</b>
                   )
-                  is presented around the predicted value. This boundary acts as an indicator when the AGDR surpasses the anticipated value, indicating the potential impact of external factors.
+                  is presented around the {{ predictionTitle }}. This boundary acts as an indicator when the {{ realTitle }} surpasses the anticipated value, indicating the potential impact of external factors.
                 </p>
                 <p>Additionally, there are red and green lines representing the 
                   <b :style="`color:${odlOptions.color[3]}`" @mouseover="hoverLegend(maxTitle)">{{ maxTitle }}</b>
                   and 
                   <b :style="`color:${odlOptions.color[2]}`" @mouseover="hoverLegend(minTitle)">{{ minTitle }}</b> 
-                  of the AGDR range. These lines provide an approximate range for the natural AGDR. If the real AGDR surpasses or falls below these limits, it indicates an abnormal reading.
+                  of the AGDR range. These lines provide an approximate range for the natural AGDR. If the AGDR surpasses or falls below these limits, it indicates an abnormal reading.
                 </p>
                 <p v-if="(odlFeature.truePoints && odlFeature.truePoints.length) || (odlFeature.falsePoints && odlFeature.falsePoints.length)">
-                  Furthermore, we can evaluate the hypothesis regarding the relationship between increased precipitation and AGDR by comparing the gradients of the predicted values with those of the actual values.
+                  Furthermore, we can evaluate the hypothesis regarding the relationship between increased precipitation and {{ predictionTitle }} with {{ realTitle }}.
                   <span v-if="(odlFeature.falsePoints && odlFeature.falsePoints.length) || (odlFeature.truePoints && odlFeature.truePoints.length)"> For instance, </span>
                   <span v-if="odlFeature.falsePoints && odlFeature.falsePoints.length">at the given timestamps of
                     <span v-for="(badPoint, index) in odlFeature.falsePoints" :key="badPoint">
@@ -153,7 +153,7 @@
                                 v-bind="attrs"
                                 v-on="on"
                                 @mouseover="hoverOver([badPoint])"
-                              >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                              >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm") }}</strong>
                             </template>
                             <span>{{ moment(badPoint * 1000).fromNow() }}</span>
                           </v-tooltip>
@@ -171,7 +171,7 @@
                           v-on="on"
                         >red dotted lines</strong>
                       </template>
-                      <span>{{ odlFeature.falsePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                      <span>{{ odlFeature.falsePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm")).join(', ') }}</span>
                     </v-tooltip>
                       , it is evident that while the predicted values are rising, the actual values are moving in the opposite direction indicating there might be effect of other external elemt rather than precipitation. Conversely, when we observe the 
                       <v-tooltip bottom>
@@ -182,7 +182,7 @@
                           v-on="on"
                         >green dotted lines</strong>
                       </template>
-                      <span>{{ odlFeature.truePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm:ss")).join(', ') }}</span>
+                      <span>{{ odlFeature.truePoints.map(gp => moment(gp * 1000).format("y-MM-DD HH:mm")).join(', ') }}</span>
                     </v-tooltip>
                       at 
                     <span v-for="(goodPoint, index) in odlFeature.truePoints" :key="goodPoint">
@@ -197,15 +197,14 @@
                               v-bind="attrs"
                               v-on="on"
                               @mouseover="hoverOver([goodPoint])"
-                            >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm:ss") }}</strong>
+                            >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm") }}</strong>
                           </template>
                           <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
                         </v-tooltip>
                       </u>
                     </span>
                   </span>
-                  <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">, it is shown the predicted and actual values exhibit a similar increasing pattern in their slopes.</span>
-                  This observation is further supported by an increase of precipitation, indicated by the evidence of increased AGDR, thereby strengthening the hypothesis that the rise in AGDR is attributed to heightened precipitation.
+                  <span v-if="odlFeature.truePoints && odlFeature.truePoints.length">, it is shown the predicted and actual values exhibit a similar increasing pattern in their slopes, Strengthening the hypothesis that the rise in {{ realTitle }} is attributed to heightened precipitation.</span>
                 </p>
               </v-card-subtitle>
 
@@ -227,7 +226,13 @@
                         Once a station is chosen, the intended users will have access to sophisticated data visualizations that include interpretations, prediction capabilities, and simulation tools. With respect to the prediction and simulation tools, users can select their desired time of year to view the prediction model. Furthermore, there are two dropdown menus available that enable users to simulate rainfall impact by adjusting a multiplier ranging from 0 to 2. Additionally, using the same tool and format, users can examine the effects of precipitation occurring two hours prior.
                       </p>
 
-                      <v-carousel class="mt-4">
+                      <v-carousel
+                        cycle
+                        height="500"
+                        show-arrows-on-hover
+                        progress
+                        :dark="true"
+                        class="mt-4">
                         <v-carousel-item
                           src="../assets/1.jpeg"
                           reverse-transition="fade-transition"
@@ -235,6 +240,16 @@
                         ></v-carousel-item>
                         <v-carousel-item
                           src="../assets/2.jpeg"
+                          reverse-transition="fade-transition"
+                          transition="fade-transition"
+                        ></v-carousel-item>
+                        <v-carousel-item
+                          src="../assets/3.jpeg"
+                          reverse-transition="fade-transition"
+                          transition="fade-transition"
+                        ></v-carousel-item>
+                        <v-carousel-item
+                          src="../assets/7.jpg"
                           reverse-transition="fade-transition"
                           transition="fade-transition"
                         ></v-carousel-item>
@@ -398,7 +413,7 @@ export default {
             symbol: ['none', 'none'],
             label: { show: false },
             lineStyle: { color: 'green'},
-            data: truePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+            data: truePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm") }) ),
           }
 
         this.negativeMarklines = {
@@ -406,7 +421,7 @@ export default {
             symbol: ['none', 'none'],
             label: { show: false },
             lineStyle: { color: 'red'},
-            data: falsePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm:ss") }) ),
+            data: falsePoints.map(timestamp => ({ xAxis: moment(new Date(timestamp * 1000)).format("y-MM-DD HH:mm") }) ),
           }
 
         odl.option.yAxis = [];
@@ -566,7 +581,7 @@ export default {
 
           var date = new Date(timestamp * 1000) //.substr(0, 10)
 
-          var dateString = moment(date).format("y-MM-DD HH:mm:ss")
+          var dateString = moment(date).format("y-MM-DD HH:mm")
 
           odl.option.xAxis[0].data.push(dateString);
         });
@@ -600,11 +615,22 @@ export default {
 
       indexOfTimestamps.forEach(function(index) {
         // 显示 tooltip 
+        chart.dispatchAction({
+          type: 'downplay',
+          seriesIndex: 0,
+          dataIndex: index
+        })
+        //index = (index + 1) % uniqueDates.length;
+        chart.dispatchAction({
+          type: 'highlight',
+          seriesIndex: 0,
+          dataIndex: index
+        })
         chart.dispatchAction({ 
-          type: indexOfTimestamps.length > 1 ? 'showTip': 'showTip', 
+          type: 'showTip', 
           seriesIndex: 0, 
           dataIndex: index 
-        }) 
+        })
       })
     },
     hoverLegend:function (legendTitle){

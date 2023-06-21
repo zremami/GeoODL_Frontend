@@ -162,7 +162,7 @@ export default {
     }),
   computed: {
     dateRangeText () {
-      return this.datesFilter.map(e => moment(e).format('y-MM-DD HH:mm:ss')).join(' ~ ')
+      return this.datesFilter.map(e => moment(e).format('y-MM-DD HH:mm')).join(' ~ ')
     },
   },
   created() {

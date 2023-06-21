@@ -1,10 +1,29 @@
 <template>
 <v-app>
   <header>
-    <v-toolbar>
-      <v-toolbar-items>
-        <v-btn to="/">Home</v-btn>
-      </v-toolbar-items>
+    <v-toolbar
+
+      dark
+      class="primary"
+    >
+      <v-toolbar-title>A Web-Based Decision Support System for Spatial Problem Solving</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <v-btn icon>
+        <v-icon>mdi-home</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+
+        <v-img
+          lazy-src="./assets/logo copy.png"
+          max-height="70"
+          max-width="70"
+          src="./assets/logo copy.png"
+        ></v-img>
+      
     </v-toolbar>
   </header>
   <v-main>
@@ -47,11 +66,11 @@
         <div class="text-center">
           <v-dialog
             v-model="dialog"
-            width="500"
+            width="800"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                color="red lighten-2"
+                color="primary"
                 dark
                 v-bind="attrs"
                 v-on="on"
@@ -67,7 +86,7 @@
 
               <v-card-text>
                 <v-row>
-                  <v-col class="ma-auto">
+                  <v-col class="mt-5 ma-auto">
                     <p>
                       This project involves the development of a web-based spatial decision support system designed to assist doctors and policymakers in assessing the risk level of Ambient Gamma Dose Rate (AGDR) in Germany. The purpose of this application, developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," provides a comprehensive tool for analyzing and visualizing gamma ambient dose rate data. The system is evaluated using this application, which has been specifically commissioned by the Bundesamt für Strahlenschutz (BfS).
                     </p><p>
