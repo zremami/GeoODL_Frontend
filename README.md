@@ -10,56 +10,69 @@ This project is a web-based Decision Support System (DSS) designed to solve spat
 
 ## Libraries Used
 
-- Vue.js
-- Vuetify
-- Vue Router
-- Vuex
-- Moment.js
-- Vue-ECharts
-- OpenLayers
+- [Vue.js](https://vuejs.org/) - JavaScript framework for building user interfaces.
+- [Vuetify](https://vuetifyjs.com/) - Material Design component library for Vue.js.
+- [Vue Router](https://router.vuejs.org/) - Official router for Vue.js, enabling navigation between views.
+- [Vuex](https://vuex.vuejs.org/) - State management pattern and library for Vue.js applications.
+- [Moment.js](https://momentjs.com/) - Library for parsing, validating, manipulating, and formatting dates and times in JavaScript.
+- [Vue-ECharts](https://github.com/ecomfe/vue-echarts) - Vue.js wrapper for ECharts, a powerful charting and visualization library.
+- [OpenLayers](https://openlayers.org/) - High-performance, feature-rich mapping library for creating interactive maps.
+
+These libraries provide essential functionality, user interface components, state management, and data visualization capabilities to enhance the development of the web-based Decision Support System.
+Feel free to customize the list of libraries according to your project's specific dependencies. You can include additional information or descriptions for each library if desired.
+For more details and usage instructions, please refer to the respective library documentation linked above.
 
 ## Installation
-
 Follow the steps below to get the project up and running on your local machine:
 
 1. Clone the repository:
-   git clone [https://github.com/zremami/GeoODL_Frontend.git]
+   - git clone [https://github.com/zremami/GeoODL_Frontend.git]
    
 3. Navigate to the project directory:
-   cd your-repo
+   - cd your-repo
    
 4. Install the dependencies using npm or yarn:
-   npm install
+   - npm install
   or
-   yarn install
+   - yarn install
 
 5. Start the development server:
-   npm run serve
+   - npm run serve
   or
-  yarn serve
+   - yarn serve
 
 6. Compiles and minifies for production
-   npm run build
+   - npm run build
 
-8. Open your browser and visit http://localhost:8080 to view the application.
+8. Open your browser and visit **http://localhost:8080** to view the application.
    
 9. Lints and fixes files
-   npm run lint
+   - npm run lint
 
 
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-## Libraries Used
-1. Provide instructions on how to use the application
-2. Include any specific configuration steps or prerequisites if necessary
-
-
 ## Contributing
-Explain how other developers can contribute to your project
-Provide guidelines for pull requests and code style
-Include a link to the issue tracker or any specific tasks/bugs that need attention
+We welcome contributions to enhance the functionality and features of this project. If you would like to contribute, please follow the guidelines below:
+
+- Fork the repository and clone it to your local machine.
+- Create a new branch for your feature or bug fix: `git checkout -b my-feature`.
+- Make your changes and test them thoroughly.
+- Commit your changes: `git commit -m "Add my feature"`.
+- Push your changes to the branch: `git push origin my-feature`.
+- Submit a pull request to the `main` branch of this repository.
+
+Please ensure that your pull request adheres to our [code of conduct](CONTRIBUTING.md) and includes a detailed description of the changes you made.
+
+We appreciate your contributions, whether it's through bug reports, feature suggestions, or code contributions. Together, we can improve the Decision Support System and make it even more useful for users.
+
+Thank you to the following contributors who have helped make this project better:
+
+- Zahra Emami ([@johndoe](https://github.com/zremami))
+
+If you would like to be included in the list of contributors, please submit your pull request, and your name will be added.
 
 
 ## License
