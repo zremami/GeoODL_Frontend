@@ -32,21 +32,21 @@ Follow the steps below to get the project up and running on your local machine:
    - cd your-repo
    
 4. Install the dependencies using npm or yarn:
-   - npm install
+   - npm install\
      or
    - yarn install
 
 5. Start the development server:
-   - npm run serve
+   - npm run serve\
      or
    - yarn serve
 
-6. Compiles and minifies for production
+6. Open your browser and visit **http://localhost:8080** to view the application.
+   
+7. Compiles and minifies for production
    - npm run build
 
-8. Open your browser and visit **http://localhost:8080** to view the application.
-   
-9. Lints and fixes files
+8. Lints and fixes files
    - npm run lint
 
 
