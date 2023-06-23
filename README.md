@@ -33,12 +33,12 @@ Follow the steps below to get the project up and running on your local machine:
    
 4. Install the dependencies using npm or yarn:
    - npm install
-  # or
+     or
    - yarn install
 
 5. Start the development server:
    - npm run serve
-  # or
+     or
    - yarn serve
 
 6. Compiles and minifies for production
