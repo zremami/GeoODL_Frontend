@@ -29,7 +29,7 @@
       </v-card>
     </v-dialog>
     <div id="popup"></div>
-    <v-btn style="position: absolute;top:10px;right:10px;z-index: 1000" id="current-location-button">My Location {{ userLocation }}</v-btn>
+    <v-btn style="position: absolute;top:10px;right:10px;z-index: 1" id="current-location-button">My Location {{ userLocation }}</v-btn>
   </v-container>
 </template>
 

@@ -36,8 +36,11 @@
           <v-icon>mdi-printer</v-icon>
         </v-btn>
 
+        <v-app-bar-nav-icon v-if="odlFeature && odlFeature.result" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </v-toolbar>
+
     </v-card>
+
 
     <vue-html2pdf
       :show-layout="true"
@@ -90,7 +93,7 @@
                           class="d-inline-block"
                           v-bind="attrs"
                           v-on="on"
-                          @mouseover="hoverOver(odlFeature && odlFeature.result ? [Math.min(...odlFeature.result.map(e => e.end_measure))] : [])"
+                          @mouseover="hoverTimestamp(odlFeature && odlFeature.result ? [Math.min(...odlFeature.result.map(e => e.end_measure))] : [])"
                         >{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm") }}</strong>
                       </template>
                       <span>{{ moment(Math.min(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
@@ -104,7 +107,7 @@
                           class="d-inline-block"
                           v-bind="attrs"
                           v-on="on"
-                          @mouseover="hoverOver([Math.max(...odlFeature.result.map(e => e.end_measure))])"
+                          @mouseover="hoverTimestamp([Math.max(...odlFeature.result.map(e => e.end_measure))])"
                         >{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).format("y-MM-DD HH:mm") }}</strong>
                       </template>
                       <span>{{ moment(Math.max(...odlFeature.result.map(e => e.end_measure)) * 1000).fromNow() }}</span>
@@ -124,11 +127,9 @@
                 </p>
                 <p>
                   In order to detect deviations of the {{ realTitle }} caused by rainfall, a yellow boundary
-                  (
-                    <b :style="`color:${odlOptions.color[1]}`" @mouseover="hoverLegend(stdLowerBoundTitle)">{{ stdLowerBoundTitle }}</b>
+                  (<b :style="`color:${odlOptions.color[1]}`" @mouseover="hoverLegend(stdLowerBoundTitle)">{{ stdLowerBoundTitle }}</b>
                     -
-                    <b :style="`color:${odlOptions.color[0]}`" @mouseover="hoverLegend(stdUpperBoundTitle)">{{ stdUpperBoundTitle }}</b>
-                  )
+                    <b :style="`color:${odlOptions.color[0]}`" @mouseover="hoverLegend(stdUpperBoundTitle)">{{ stdUpperBoundTitle }}</b>)
                   is presented around the {{ predictionTitle }}. This boundary acts as an indicator when the {{ realTitle }} surpasses the anticipated value, indicating the potential impact of external factors.
                 </p>
                 <p>Additionally, there are red and green lines representing the 
@@ -152,7 +153,7 @@
                                 class="d-inline-block red--text"
                                 v-bind="attrs"
                                 v-on="on"
-                                @mouseover="hoverOver([badPoint])"
+                                @mouseover="hoverTimestamp([badPoint])"
                               >{{ moment(badPoint * 1000).format("y-MM-DD HH:mm") }}</strong>
                             </template>
                             <span>{{ moment(badPoint * 1000).fromNow() }}</span>
@@ -196,7 +197,7 @@
                               class="d-inline-block green--text"
                               v-bind="attrs"
                               v-on="on"
-                              @mouseover="hoverOver([goodPoint])"
+                              @mouseover="hoverTimestamp([goodPoint])"
                             >{{ moment(goodPoint * 1000).format("y-MM-DD HH:mm") }}</strong>
                           </template>
                           <span>{{ moment(goodPoint * 1000).fromNow() }}</span>
@@ -261,8 +262,48 @@
                 </v-row>
               </v-card-title>
 
+              <v-navigation-drawer
+      v-if="odlFeature && odlFeature.result"
+      v-model="drawer"
+      absolute
+      bottom
+      temporary
+    >
+      <v-toolbar
+        flat
+        >
+        <v-toolbar-title>Statistic Information</v-toolbar-title>
+      </v-toolbar>
+      <v-list
+        nav
+        dense
+      >
+        <v-list-item-group
+          v-model="group"
+          active-class="deep-primary--text text--accent-4"
+        >
+          <v-list-item>
+            <v-list-item-title>{{ realTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[realKey])).toPrecision(3) }} {{ agdrUnit }}</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title>{{ predictionTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[predictionKey])).toPrecision(3) }} {{ agdrUnit }}</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title>{{ precipitationTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[precipitationKey])).toPrecision(3) }} {{ precipitationUnit }}</v-list-item-title>
+          </v-list-item>
+
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
+
             </v-card>
+
+
           </v-card>
+
+
 
         <!-- PDF Content Here -->
       </section>
@@ -341,10 +382,19 @@ export default {
       stdLowerBoundTitle: 'Standard deviation lower',
       maxTitle: 'High AGDR limit',
       minTitle: 'Low AGDR limit',
+      predictionKey: 'odl_prediction',
+      realKey: 'odl_real',
+      precipitationKey: 'precipitation',
+      //stdUpperBoundKey: 'mae_upper_bound'
+      //stdLowerBoundKey: 'mae_lower_bound'
+      agdrUnit: '\u00b5Sv/h',
+      precipitationUnit: 'mm/h',
       negativePointsActive: true,
       posetivePointsActive: true,
       posetiveMarklines: null, 
       negativeMarklines: null,
+      drawer: false,
+      group: null,
     }
   },
   watch: {
@@ -353,6 +403,9 @@ export default {
         this.fillOdl();
       },
       deep: false,
+    },
+    group () {
+      this.drawer = false
     },
   },
   methods:
@@ -402,12 +455,6 @@ export default {
         //precipitation.option.title.text = features[0].Locality_code;
         //precipitation.option.yAxis[0].name = 'precipitation';
 
-        let predictionKey = 'odl_prediction'
-        let realKey = 'odl_real'
-        let precipitationKey = 'precipitation'
-        //let stdUpperBoundKey = 'mae_upper_bound'
-        //let stdLowerBoundKey = 'mae_lower_bound'
-
         this.posetiveMarklines = {
             name: 'green',
             symbol: ['none', 'none'],
@@ -438,7 +485,7 @@ export default {
               }
             },
             axisLabel: {
-              formatter: '{value} \u00b5Sv/h'
+              formatter: `'{value} ${this.agdrUnit}'`
             },
             scale:true,
             //boundaryGap: ['0', '20%']
@@ -459,7 +506,7 @@ export default {
               }
             },
             axisLabel: {
-              formatter: '{value} mm/h'
+              formatter: `'{value} ${this.precipitationUnit}'`
             },
             scale:false,
             boundaryGap: ['0', '200%']
@@ -469,7 +516,7 @@ export default {
           name: this.realTitle,
           type: 'line',
           yAxisIndex: 0,
-          data: features.map(e => e[realKey]),
+          data: features.map(e => e[this.realKey]),
           showSymbol: false,
           lineStyle: {
             width: 3
@@ -481,7 +528,7 @@ export default {
           name: this.predictionTitle,
           type: 'line',
           yAxisIndex: 0,
-          data: features.map(e => e[predictionKey]),
+          data: features.map(e => e[this.predictionKey]),
           showSymbol: false,
           lineStyle: {
             width: 3
@@ -493,7 +540,7 @@ export default {
           name: this.precipitationTitle,
           type: 'bar',
           yAxisIndex: 1,
-          data: features.map(e => e[precipitationKey]),
+          data: features.map(e => e[this.precipitationKey]),
         }
 
         /*
@@ -601,7 +648,8 @@ export default {
       const average = values.reduce((a,b) => a + b, 0) / values.length;
       return average;
     },
-    hoverOver:function (timestamps){
+    // Writing Code to Trigger Serie's xAxis Items Of Component Action Manually
+    hoverTimestamp:function (timestamps){
       // Access the chart instance and trigger the hover effect on the x-axis
       const chart = this.echartInstance;
 
@@ -614,18 +662,19 @@ export default {
         .filter(elements => elements !== null)
 
       indexOfTimestamps.forEach(function(index) {
-        // 显示 tooltip 
+        // do downplay 
         chart.dispatchAction({
           type: 'downplay',
           seriesIndex: 0,
           dataIndex: index
         })
-        //index = (index + 1) % uniqueDates.length;
+        // show highlight 
         chart.dispatchAction({
           type: 'highlight',
           seriesIndex: 0,
           dataIndex: index
         })
+        // show tooltip 
         chart.dispatchAction({ 
           type: 'showTip', 
           seriesIndex: 0, 
@@ -633,29 +682,31 @@ export default {
         })
       })
     },
+    // Writing Code to Trigger Legend Of Component Action Manually
     hoverLegend:function (legendTitle){
-      // Access the chart instance and trigger the hover effect on the x-axis
+      // Access the chart instance and trigger the legend select/unselect effect
       const chart = this.echartInstance;
 
-      // 显示 legend 
+      // Unselect legend 
       chart.dispatchAction({
           type: 'legendUnSelect',
           // legend name
           name: legendTitle
       })
-       // 显示 legend 
+       // Select legend 
        chart.dispatchAction({
           type: 'legendSelect',
           // legend name
           name: legendTitle
       })
     },
+    // Writing Code to Add/Remove Marklines On The Series (Real (red)/Predicted AGDR (green)) Manually
     toggelMarkline:function (value, marklineName){
-      // Access the chart instance and trigger the hover effect on the x-axis
+      // Access the chart instance and add/remove mark line items on the x-axis
       let odl = this.$refs.odl
       
+      // Find the appropriate markline information by utilizing the given parameters, which include a value (true/false to indicate visibility) and the marklineName (the name of the marklines, either red or green).
       let serieName = ''
-
       if(marklineName == 'red')
         serieName = this.realTitle
       else
@@ -670,6 +721,7 @@ export default {
           data = [...this.posetiveMarklines.data]
       }
 
+      // Update new makline data items
       odl.option.series.find(e => e.name === serieName).markLine.data = data
     },
   }
@@ -677,7 +729,6 @@ export default {
 </script>
 
 <style scoped>
-
   .figure {
     margin: 0;
     padding: 0;
@@ -687,18 +738,5 @@ export default {
     display: block;
     width: 100%;
     height: 60vh;
-  }
-
-  .animated-span {
-    animation: fadeAnimation 0.5s;
-  }
-
-  @keyframes fadeAnimation {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
   }
 </style>

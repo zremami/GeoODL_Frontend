@@ -10,17 +10,53 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn icon>
+      <v-btn icon @click="refreshPage">
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
+
+      <v-menu
+        right
+        bottom
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+          >
+            <v-icon>mdi-dots-vertical</v-icon>
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item
+            v-for="project in projectLinks"
+            :key="project.key"
+          >
+            
+            <v-list-item-title>
+              <v-btn class="d-block" @click="redirectTo(project.link)">
+                  <v-icon class="me-2">{{ project.icon }}</v-icon>
+                  {{ project.name }}
+                  <v-icon
+                    v-for="icon2 in project.icon2"
+                    :key="icon2"
+                    class=" ms-1"
+                    color="blue darken-2"
+                    >{{ icon2 }}
+                  </v-icon>
+              </v-btn>
+              
+            </v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
         <v-img
+        class="mx-2"
           lazy-src="./assets/logo copy.png"
-          max-height="70"
-          max-width="70"
+          max-height="60"
+          max-width="60"
           src="./assets/logo copy.png"
         ></v-img>
       
@@ -149,6 +185,11 @@ import MapContainer from './components/MapContainer'
       ],
       effect1: 1.0,
       effect2: 1.0,
+      projectLinks: [
+        {'key': 'front', 'name': 'FrontEnd git repository', 'link': 'https://github.com/zremami/myproject-front.git', 'icon': 'mdi-github', 'icon2': ['mdi-vuejs', 'mdi-vuetify']},
+        {'key': 'back', 'name': 'BackEnd git repository', 'link': 'https://github.com/zremami/myproject.git', 'icon': 'mdi-github', 'icon2': ['mdi-language-python', 'mdi-api']},
+        {'key': 'geoODL', 'name': 'GeoODL git repository', 'link': 'https://github.com/zremami/GeoODL.git', 'icon': 'mdi-github', 'icon2': ['mdi-language-python', 'mdi-panda']},
+      ],
     }),
     methods:
     {
@@ -166,6 +207,14 @@ import MapContainer from './components/MapContainer'
       },
       effect2Callback: function(value){
         this.effect2 = value;
+      },
+      refreshPage() {
+        window.location.reload();
+      },
+      redirectTo(url) {
+        window.open(url, '_blank');
+        //window.location.href = url;
+        //this.$router.push(url);
       }
     }
   }
