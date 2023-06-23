@@ -23,9 +23,9 @@ This project is a web-based Decision Support System (DSS) designed to solve spat
 Follow the steps below to get the project up and running on your local machine:
 
 1. Clone the repository:
-   git clone [https://github.com/your-username/your-repo.git](https://github.com/zremami/myproject.git)
-
-2. Navigate to the project directory:
+   git clone [https://github.com/zremami/GeoODL_Frontend.git]
+   
+3. Navigate to the project directory:
    cd your-repo
    
 4. Install the dependencies using npm or yarn:
