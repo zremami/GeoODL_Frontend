@@ -33,12 +33,12 @@ Follow the steps below to get the project up and running on your local machine:
    
 4. Install the dependencies using npm or yarn:
    - npm install
-  or
+  # or
    - yarn install
 
 5. Start the development server:
    - npm run serve
-  or
+  # or
    - yarn serve
 
 6. Compiles and minifies for production
@@ -70,7 +70,7 @@ We appreciate your contributions, whether it's through bug reports, feature sugg
 
 Thank you to the following contributors who have helped make this project better:
 
-- Zahra Emami ([@johndoe](https://github.com/zremami))
+- Zahra Emami ([@zremami](https://github.com/zremami))
 
 If you would like to be included in the list of contributors, please submit your pull request, and your name will be added.
 
