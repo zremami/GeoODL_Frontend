@@ -57,8 +57,7 @@ Follow the steps below to get the project up and running on your local machine:
 [test](https://user-images.githubusercontent.com/zremami/GeoODL_Frontend/blob/b3ac792d2ec1199408f46dfcfa1ab3335b5f6586/src/assets/geoODL.webm)
 [movie](https://github.com/zremami/GeoODL_Frontend/raw/master/src/assets/geoODL.webm)
 
-
-https://raw.githubusercontent.com/zremami/GeoODL_Frontend/blob/b3ac792d2ec1199408f46dfcfa1ab3335b5f6586/src/assets/geoODL.webm
+[my movie](https://github.com/zremami/GeoODL_Frontend/blob/master/src/assets/geoODL.webm)
 
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
