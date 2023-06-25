@@ -52,13 +52,15 @@ Follow the steps below to get the project up and running on your local machine:
 # The server-side can be found via this address:
  - [GeoODL_Frontend](https://github.com/zremami/GeoODL_Backend.git)
 
+
 ### Output
 
-[![Watch the video](https://i.vimeocdn.com/video/1689021830-963675905463cf1d14bef8ed1653dc2461dca9449117cd4ca94090f7283fe56f-d?mw=1300&mh=731)](https://youtu.be/4sp-YFHBB-U)
+https://github.com/zremami/GeoODL_Frontend/assets/75797849/adeb78e9-4544-4e0d-ba97-4dd2334ff440
 
-[![Now in Android: 55]          // Title
-(https://i.ytimg.com/vi/Hc79sDi3f0U/maxresdefault.jpg)] // Thumbnail
-(https://www.youtube.com/watch?v=Hc79sDi3f0U "Now in Android: 55")    // Video Link
+
+[Watch full version the video on youtube (1920 x 1080)](https://youtu.be/XwzajrjVxL8)
+
+
 
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
