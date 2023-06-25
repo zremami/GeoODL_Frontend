@@ -56,6 +56,8 @@ Follow the steps below to get the project up and running on your local machine:
 
 [![Watch the video](https://i.vimeocdn.com/video/1689021830-963675905463cf1d14bef8ed1653dc2461dca9449117cd4ca94090f7283fe56f-d?mw=1300&mh=731)](https://youtu.be/4sp-YFHBB-U)
 
+[<img src="https://i.ytimg.com/vi/Hc79sDi3f0U/maxresdefault.jpg" width="50%">](https://www.youtube.com/watch?v=Hc79sDi3f0U "Now in Android: 55")
+
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
