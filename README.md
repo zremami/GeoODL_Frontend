@@ -49,13 +49,11 @@ Follow the steps below to get the project up and running on your local machine:
 8. Lints and fixes files
    - npm run lint
 
-# The server-side can be found via this address:
+## The server-side can be found via this address:
  - [GeoODL_Backend](https://github.com/zremami/GeoODL_Backend.git)
 
 
-### Output
-
-
+## Output
 
 https://github.com/zremami/GeoODL_Frontend/assets/75797849/77fbcdb7-666a-4c66-8a97-717c29770ebf
 
