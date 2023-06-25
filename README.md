@@ -1,6 +1,6 @@
 # A Web-Based Decision Support System for Spatial Problem Solving
 
-This project is a web-based Decision Support System (DSS) designed to solve spatial problems. It provides a user-friendly interface for making decisions based on spatial data and visualizations.
+This project is a web-based Decision Support System (DSS) developed as a master's thesis project titled "Designing and Evaluating a Web Spatial Decision Support System for Spatial Problem Solving," which provides a comprehensive tool for analyzing and visualizing gamma ambient dose rate data. The system is evaluated using this application, specifically commissioned by the Bundesamt für Strahlenschutz (BfS).
 
 ## Features
 
@@ -49,11 +49,12 @@ Follow the steps below to get the project up and running on your local machine:
 8. Lints and fixes files
    - npm run lint
 
-
+# The server-side can be found via this address:
+ - [GeoODL_Frontend](https://github.com/zremami/GeoODL_Backend.git)
 
 ### Output
 
-[![Watch the video](https://i.vimeocdn.com/video/1689021830-963675905463cf1d14bef8ed1653dc2461dca9449117cd4ca94090f7283fe56f-d?mw=1300&mh=731)](https://player.vimeo.com/video/839484849?h=7fd4ebd336)
+[![Watch the video](https://i.vimeocdn.com/video/1689021830-963675905463cf1d14bef8ed1653dc2461dca9449117cd4ca94090f7283fe56f-d?mw=1300&mh=731)](https://youtu.be/4sp-YFHBB-U)
 
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
