@@ -55,10 +55,11 @@ Follow the steps below to get the project up and running on your local machine:
 
 ### Output
 
-https://github.com/zremami/GeoODL_Frontend/assets/75797849/adeb78e9-4544-4e0d-ba97-4dd2334ff440
 
 
-[Watch full version the video on youtube (1920 x 1080)](https://youtu.be/XwzajrjVxL8)
+https://github.com/zremami/GeoODL_Frontend/assets/75797849/77fbcdb7-666a-4c66-8a97-717c29770ebf
+
+[Watch full version on Youtube (1920 x 1080)](https://youtu.be/XwzajrjVxL8)
 
 
 
