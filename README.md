@@ -57,7 +57,7 @@ Follow the steps below to get the project up and running on your local machine:
 ![test](https://user-images.githubusercontent.com/zremami/GeoODL_Frontend/blob/b3ac792d2ec1199408f46dfcfa1ab3335b5f6586/src/assets/geoODL.webm)
 ![movie](https://github.com/zremami/GeoODL_Frontend/raw/master/src/assets/geoODL.webm)
 
-![my movie](https://github.com/zremami/GeoODL_Frontend/blob/df01c3df5fd4c7dcf41e661dae87e7bcff228753/src/assets/Kazam_screencast_00003.webm)
+![my movie](https://github.com/zremami/GeoODL_Frontend/blob/ccad2302bcc611424391a0169ee7aa1c65847e6f/src/assets/geoODL_w500.mp4)
 
 ![test](https://github.com/zremami/GeoODL_Frontend/blob/0acd2dabf906337e88b261e753f3688e756515e2/src/assets/151445231-616b5aae-462c-4347-a5d7-a5ecd1127c28.gif)
 
