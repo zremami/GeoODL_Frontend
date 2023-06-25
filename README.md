@@ -52,18 +52,8 @@ Follow the steps below to get the project up and running on your local machine:
 
 
 ### Output
-![presentation](https://github.com/zremami/GeoODL_Frontend/raw/master/src/assets/geoODL.webm)
 
-![test](https://user-images.githubusercontent.com/zremami/GeoODL_Frontend/blob/b3ac792d2ec1199408f46dfcfa1ab3335b5f6586/src/assets/geoODL.webm)
-![movie](https://github.com/zremami/GeoODL_Frontend/raw/master/src/assets/geoODL.webm)
-
-![my movie](https://github.com/zremami/GeoODL_Frontend/blob/ccad2302bcc611424391a0169ee7aa1c65847e6f/src/assets/geoODL_w500.mp4)
-
-![test](https://github.com/zremami/GeoODL_Frontend/blob/0acd2dabf906337e88b261e753f3688e756515e2/src/assets/151445231-616b5aae-462c-4347-a5d7-a5ecd1127c28.gif)
-
-
-[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://player.vimeo.com/video/839484849?h=7fd4ebd336)
-
+[![Watch the video](https://i.vimeocdn.com/video/1689021830-963675905463cf1d14bef8ed1653dc2461dca9449117cd4ca94090f7283fe56f-d?mw=1300&mh=731)](https://player.vimeo.com/video/839484849?h=7fd4ebd336)
 
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
