@@ -275,15 +275,15 @@
           active-class="deep-primary--text text--accent-4"
         >
           <v-list-item>
-            <v-list-item-title>{{ realTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[realKey])).toPrecision(3) }} {{ agdrUnit }}</v-list-item-title>
+            <v-list-item-title>{{ realTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[realKey])).toPrecision(3) }}</v-list-item-title>
           </v-list-item>
 
           <v-list-item>
-            <v-list-item-title>{{ predictionTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[predictionKey])).toPrecision(3) }} {{ agdrUnit }}</v-list-item-title>
+            <v-list-item-title>{{ predictionTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[predictionKey])).toPrecision(3) }}</v-list-item-title>
           </v-list-item>
 
           <v-list-item>
-            <v-list-item-title>{{ precipitationTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[precipitationKey])).toPrecision(3) }} {{ precipitationUnit }}</v-list-item-title>
+            <v-list-item-title>{{ precipitationTitle }} Mean: {{ getMean(odlFeature.result.map(e => e[precipitationKey])).toPrecision(3) }}</v-list-item-title>
           </v-list-item>
 
         </v-list-item-group>
