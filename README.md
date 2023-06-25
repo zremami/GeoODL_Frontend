@@ -61,6 +61,10 @@ Follow the steps below to get the project up and running on your local machine:
 
 ![test](https://github.com/zremami/GeoODL_Frontend/blob/0acd2dabf906337e88b261e753f3688e756515e2/src/assets/151445231-616b5aae-462c-4347-a5d7-a5ecd1127c28.gif)
 
+
+[![Watch the video](https://i.imgur.com/vKb2F1B.png)](https://youtu.be/vt5fpE0bzSY)
+
+
 ## Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
